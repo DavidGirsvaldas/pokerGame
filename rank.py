@@ -1,5 +1,6 @@
 from enum import IntEnum
 
+
 class Rank(IntEnum):
     r1 = 1
     r2 = 2
