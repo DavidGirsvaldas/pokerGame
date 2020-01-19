@@ -76,5 +76,31 @@ class MyTestCase(unittest.TestCase):
         result = combinations.find_full_house(test_input)
         self.assertEqual(None, result)
 
+    def test__find_flush(self):
+        sh = Suit.hearths
+        ss = Suit.spade
+        # when 5 hearths flush then returns combo with kickers ordered by strength
+        test_input = [Card(Rank.r1, sh), Card(Rank.r2, sh), Card(Rank.r4, sh), Card(Rank.r5, sh), Card(Rank.r6, sh)]
+        result = combinations.find_flush(test_input)
+        self.assertEqual(6, result.strength)
+        self.assertEqual([Rank.r6, Rank.r5, Rank.r4, Rank.r2, Rank.r1], result.kickers)
+
+        # when 5 spades flush then returns combo with kickers ordered by strength
+        test_input = [Card(Rank.r5, ss), Card(Rank.r10, ss), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r6, ss)]
+        result = combinations.find_flush(test_input)
+        self.assertEqual(6, result.strength)
+        self.assertEqual([Rank.Ace, Rank.r10, Rank.r6, Rank.r5, Rank.r1], result.kickers)
+
+        # when more than 5 cards in flush returns only strongest 5
+        test_input = [Card(Rank.r5, sh), Card(Rank.r10, sh), Card(Rank.Ace, sh), Card(Rank.r1, sh), Card(Rank.r6, sh), Card(Rank.Jack, sh)]
+        result = combinations.find_flush(test_input)
+        self.assertEqual(6, result.strength)
+        self.assertEqual([Rank.Ace, Rank.Jack, Rank.r10, Rank.r6, Rank.r5], result.kickers)
+
+        # when only 4 cards in suit returns None
+        test_input = [Card(Rank.r5, sh), Card(Rank.r10, sh), Card(Rank.Ace, sh), Card(Rank.r1, sh), Card(Rank.r6, ss)]
+        result = combinations.find_flush(test_input)
+        self.assertEqual(None, result)
+
 if __name__ == '__main__':
     unittest.main()
