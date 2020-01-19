@@ -2,7 +2,7 @@ import suit
 from rank import Rank
 
 
-class Card():
+class Card:
     rank: Rank
     suit: suit
 
