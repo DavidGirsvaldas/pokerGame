@@ -14,16 +14,22 @@ def find_high_card(ranks: Iterable[Rank]):
     return Rank(max_rank)
 
 
-def find_four_of_a_kind(ranks: Iterable[Rank]):
-    rank_occupancies = defaultdict()
-    for rank in ranks:
-        if not (rank in rank_occupancies):
-            rank_occupancies[rank] = 0
-        rank_occupancies[rank] += 1
-        if rank_occupancies[rank] == 4:
-            return rank
+def find_four_of_a_kind(cards: Iterable[Card]):
+    ranks = [card.rank for card in cards]
+    ranks_sorted = sorted(ranks, reverse=True)
+    hand = []
+    for i in range(0, len(ranks)-3):
+        if ranks_sorted[i] == ranks_sorted[i+1] == ranks_sorted[i+2] == ranks_sorted[i+3]:
+            for _ in range(0, 4):
+                hand.append(ranks_sorted[i])
+            break
+    if len(hand)!=4:
+        return None
+    for rank in ranks_sorted:
+        if rank != hand[0]:
+            hand.append(rank)
+            return Combination(8, hand)
     return None
-
 
 def is_royal_flush(cards: Iterable[Card]):
     high_cards = defaultdict()
@@ -39,8 +45,8 @@ def is_royal_flush(cards: Iterable[Card]):
                 contains_royal_flush = False
                 break
         if contains_royal_flush:
-            return True
-    return False
+            return Combination(10, sorted(high_cards[suit], reverse=True))
+    return None
 
 
 def find_full_house(cards: List[Card]):
