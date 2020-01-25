@@ -52,26 +52,30 @@ class MyTestCase(unittest.TestCase):
         sd = Suit.diamonds
         ss = Suit.spade
         sh = Suit.hearths
+        # when full house found then returns combo ordered by kickers
         test_input = [Card(Rank.Ace, sc), Card(Rank.Ace, sd), Card(Rank.Ace, ss), Card(Rank.King, sc),
                       Card(Rank.King, sh)]
         result = combinations.find_full_house(test_input)
-        expected = Combination(7, [Rank.Ace, Rank.King])
+        expected = Combination(7, [Rank.Ace, Rank.Ace, Rank.Ace, Rank.King, Rank.King])
         self.assertEqual(expected.strength, result.strength)
         self.assertEqual(expected.kickers, result.kickers)
 
+        # when full house found then returns combo ordered by kickers
         test_input = [Card(Rank.Jack, sc), Card(Rank.Jack, sd), Card(Rank.Jack, ss), Card(Rank.r10, sc),
                       Card(Rank.r10, sh)]
         result = combinations.find_full_house(test_input)
-        expected = Combination(7, [Rank.Jack, Rank.r10])
+        expected = Combination(7, [Rank.Jack, Rank.Jack, Rank.Jack, Rank.r10, Rank.r10])
         self.assertEqual(expected.strength, result.strength)
         self.assertEqual(expected.kickers, result.kickers)
 
-        test_input = [Card(Rank.r2, sh), Card(Rank.r1, sc), Card(Rank.r2, sc), Card(Rank.r1, sd), Card(Rank.r1, ss)]
+        # when two full houses available then returns the higher
+        test_input = [Card(Rank.r2, sh), Card(Rank.r1, sc), Card(Rank.r2, sc), Card(Rank.r1, sd), Card(Rank.r1, ss), Card(Rank.r2, sd)]
         result = combinations.find_full_house(test_input)
-        expected = Combination(7, [Rank.r1, Rank.r2])
+        expected = Combination(7, [Rank.r2, Rank.r2, Rank.r2, Rank.r1, Rank.r1])
         self.assertEqual(expected.strength, result.strength)
         self.assertEqual(expected.kickers, result.kickers)
 
+        # when full house not found then returns None
         test_input = [Card(Rank.r2, sh), Card(Rank.r1, sc), Card(Rank.r2, sc), Card(Rank.r1, sd), Card(Rank.r3, ss)]
         result = combinations.find_full_house(test_input)
         self.assertEqual(None, result)

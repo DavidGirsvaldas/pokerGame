@@ -44,20 +44,23 @@ def is_royal_flush(cards: Iterable[Card]):
 
 
 def find_full_house(cards: List[Card]):
-    rank_occurrences = defaultdict()
-    for card in cards:
-        if card.rank not in rank_occurrences:
-            rank_occurrences[card.rank] = 0
-        rank_occurrences[card.rank] += 1
-    three_of_a_king = None
-    pair = None
-    for rank, occurrence in rank_occurrences.items():
-        if occurrence == 3:
-            three_of_a_king = rank
-        if occurrence == 2:
-            pair = rank
-    if three_of_a_king is not None and pair is not None:
-        return Combination(7, [three_of_a_king, pair])
+    ranks = [card.rank for card in cards]
+    hand = []
+    ranks_by_strength = sorted(ranks, reverse=True)
+    for i in range(0, len(ranks_by_strength) - 2):
+        if ranks_by_strength[i] == ranks_by_strength[i + 1] == ranks_by_strength[i + 2]:
+            for _ in range(0, 3):
+                hand.append(ranks_by_strength[i])
+            break
+    if len(hand) == 0:
+        return None
+    for i in range(0, len(ranks_by_strength) - 1):
+        if ranks_by_strength[i] == ranks_by_strength[i + 1] != hand[0]:
+            for _ in range(0, 2):
+                hand.append(ranks_by_strength[i])
+            break
+    if len(hand) == 5:
+        return Combination(7, hand)
     return None
 
 
