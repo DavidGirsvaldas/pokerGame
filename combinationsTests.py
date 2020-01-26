@@ -17,7 +17,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(1, result.strength)
         self.assertEqual([Rank(7), Rank(6), Rank(5), Rank(4), Rank(3)], result.kickers)
         # 2
-        test_input = [Card(Rank(13), sc), Card(Rank(10), sc), Card(Rank(1), sc), Card(Rank(2), sc), Card(Rank(7), sc), Card(Rank(5), sc), Card(Rank(4), sc)]
+        test_input = [Card(Rank(13), sc), Card(Rank(10), sc), Card(Rank(1), sc), Card(Rank(2), sc), Card(Rank(7), sc),
+                      Card(Rank(5), sc), Card(Rank(4), sc)]
         result = combinations.find_high_card(test_input)
         self.assertEqual(1, result.strength)
         self.assertEqual([Rank(13), Rank(10), Rank(7), Rank(5), Rank(4)], result.kickers)
@@ -138,12 +139,14 @@ class MyTestCase(unittest.TestCase):
         sh = Suit.hearths
         ss = Suit.spade
         # when 5 hearths straight flush then returns combo with kickers ordered by strength
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh), Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh),
+                      Card(Rank.r3, sh), Card(Rank.r4, sh)]
         result = combinations.find_straight_flush(test_input)
         self.assertEqual(9, result.strength)
         self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.r1], result.kickers)
         # when 5 spade straight flush then returns combo with kickers ordered by strength
-        test_input = [Card(Rank.King, ss), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss), Card(Rank.Jack, ss),
+        test_input = [Card(Rank.King, ss), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss),
+                      Card(Rank.Jack, ss),
                       Card(Rank.r3, sh), Card(Rank.r4, sh)]
         result = combinations.find_straight_flush(test_input)
         self.assertEqual(9, result.strength)
@@ -158,6 +161,29 @@ class MyTestCase(unittest.TestCase):
                       Card(Rank.Jack, ss), Card(Rank.r3, ss), Card(Rank.r4, ss)]
         result = combinations.find_straight_flush(test_input)
         self.assertEqual(None, result)
+
+    def test_is_straight(self):
+        sh = Suit.hearths
+        ss = Suit.spade
+        # when straight then returns combo with kickers ordered by strength (1)
+        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        result = combinations.find_straight(test_input)
+        self.assertEqual(5, result.strength)
+        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.r1], result.kickers)
+        # when two straights available then returns with stronger kicker (2)
+        test_input = [Card(Rank.King, sh), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss),
+                      Card(Rank.Jack, ss),
+                      Card(Rank.r8, sh), Card(Rank.r7, sh)]
+        result = combinations.find_straight(test_input)
+        self.assertEqual(5, result.strength)
+        self.assertEqual([Rank.King, Rank.Queen, Rank.Jack, Rank.r10, Rank.r9], result.kickers)
+        # when not straight returns None
+        test_input = [Card(Rank.King, sh), Card(Rank.r9, ss), Card(Rank.r10, sh), Card(Rank.r2, ss),
+                      Card(Rank.Jack, ss), Card(Rank.r3, sh), Card(Rank.r4, ss)]
+        result = combinations.find_straight(test_input)
+        self.assertEqual(None, result)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -12,6 +12,15 @@ def find_high_card(cards: Iterable[Card]):
     return Combination(1, ranks_sorted[:5])
 
 
+def find_straight(cards: List[Card]):
+    ranks = [card.rank for card in cards]
+    ranks_sorted = sorted(ranks, reverse=True)
+    for i in range(0, len(ranks_sorted) - 4):
+        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (ranks_sorted[i + 4] + 4):
+            return Combination(5, ranks_sorted[i:i + 5])
+    return None
+
+
 def find_flush(cards: List[Card]):
     suit_occurrences = defaultdict()
     for card in cards:
