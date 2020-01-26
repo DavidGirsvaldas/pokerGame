@@ -2,7 +2,6 @@ from typing import Iterable, List
 
 from card import Card
 from combination import Combination
-from rank import Rank
 from collections import defaultdict
 
 
@@ -11,6 +10,27 @@ def find_high_card(cards: Iterable[Card]):
     ranks_sorted = sorted(ranks, reverse=True)
     return Combination(1, ranks_sorted[:5])
 
+
+def find_two_pairs(cards: List[Card]):
+    ranks = [card.rank for card in cards]
+    rank_occurrences = defaultdict()
+    hand = []
+    for rank in ranks:
+        if rank not in rank_occurrences:
+            rank_occurrences[rank] = 0
+        rank_occurrences[rank] += 1
+        if rank_occurrences[rank] == 2:
+            hand.append(rank)
+            hand.append(rank)
+    if len(hand) < 4:
+        return None
+    sorted_hand = sorted(hand, reverse=True)
+    top_hand = sorted_hand[:4]
+    for rank in sorted(ranks, reverse=True):
+        if rank not in top_hand:
+            top_hand.append(rank)
+            return Combination(3, top_hand)
+    return None
 
 def find_three_of_a_kind(cards: List[Card]):
     ranks = [card.rank for card in cards]
@@ -34,7 +54,8 @@ def find_straight(cards: List[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)
     for i in range(0, len(ranks_sorted) - 4):
-        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (ranks_sorted[i + 4] + 4):
+        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (
+                ranks_sorted[i + 4] + 4):
             return Combination(5, ranks_sorted[i:i + 5])
     return None
 

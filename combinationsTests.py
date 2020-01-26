@@ -205,6 +205,27 @@ class MyTestCase(unittest.TestCase):
         result = combinations.find_three_of_a_kind(test_input)
         self.assertEqual(None, result)
 
+    def test_find_two_pairs(self):
+        sh = Suit.hearths
+        ss = Suit.spade
+        # when two pairs found then returns combo with highest kicker
+        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r4, sh)]
+        result = combinations.find_two_pairs(test_input)
+        self.assertEqual(3, result.strength)
+        self.assertEqual([Rank.r2, Rank.r2, Rank.r1, Rank.r1, Rank.Ace], result.kickers)
+        # when three pairs found then returns combo with highest pairs and highest kicker
+        test_input = [Card(Rank.r1, sh), Card(Rank.r3, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r3, sh)]
+        result = combinations.find_two_pairs(test_input)
+        self.assertEqual(3, result.strength)
+        self.assertEqual([Rank.r3, Rank.r3, Rank.r2, Rank.r2, Rank.r5], result.kickers)
+        # when only one pair found then returns None
+        test_input = [Card(Rank.Jack, sh), Card(Rank.Ace, ss), Card(Rank.King, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.Jack, sh)]
+        result = combinations.find_two_pairs(test_input)
+        self.assertEqual(None, result)
+
 
 if __name__ == '__main__':
     unittest.main()
