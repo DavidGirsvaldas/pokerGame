@@ -12,6 +12,24 @@ def find_high_card(cards: Iterable[Card]):
     return Combination(1, ranks_sorted[:5])
 
 
+def find_three_of_a_kind(cards: List[Card]):
+    ranks = [card.rank for card in cards]
+    rank_occurrences = defaultdict()
+    for rank in ranks:
+        if rank not in rank_occurrences:
+            rank_occurrences[rank] = 0
+        rank_occurrences[rank] += 1
+        if rank_occurrences[rank] == 3:
+            ranks_sorted = sorted(ranks, reverse=True)
+            hand = [rank, rank, rank]
+            for sorted_rank in ranks_sorted:
+                if sorted_rank != rank:
+                    hand.append(sorted_rank)
+                    if len(hand) == 5:
+                        return Combination(4, hand)
+    return None
+
+
 def find_straight(cards: List[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)

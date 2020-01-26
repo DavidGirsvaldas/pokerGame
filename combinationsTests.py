@@ -184,6 +184,27 @@ class MyTestCase(unittest.TestCase):
         result = combinations.find_straight(test_input)
         self.assertEqual(None, result)
 
+    def test_find_three_of_a_kind(self):
+        sh = Suit.hearths
+        ss = Suit.spade
+        # when three of a kind found then returns combo with kickers ordered by strength (1)
+        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r4, sh)]
+        result = combinations.find_three_of_a_kind(test_input)
+        self.assertEqual(4, result.strength)
+        self.assertEqual([Rank.r1, Rank.r1, Rank.r1, Rank.Ace, Rank.r5], result.kickers)
+        # when three of a kind found then returns combo with kickers ordered by strength (2)
+        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.Ace, sh), Card(Rank.r4, sh)]
+        result = combinations.find_three_of_a_kind(test_input)
+        self.assertEqual(4, result.strength)
+        self.assertEqual([Rank.Ace, Rank.Ace, Rank.Ace, Rank.r5, Rank.r4], result.kickers)
+        # when not found, return None
+        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r4, sh), Card(Rank.r4, sh)]
+        result = combinations.find_three_of_a_kind(test_input)
+        self.assertEqual(None, result)
+
 
 if __name__ == '__main__':
     unittest.main()
