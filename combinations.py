@@ -11,6 +11,20 @@ def find_high_card(cards: Iterable[Card]):
     return Combination(1, ranks_sorted[:5])
 
 
+def find_pair(cards: List[Card]):
+    ranks = [card.rank for card in cards]
+    ranks_sorted = sorted(ranks, reverse=True)
+    for i in range(0, len(ranks_sorted) - 1):
+        if ranks_sorted[i] == ranks_sorted[i + 1]:
+            hand = [ranks_sorted[i], ranks_sorted[i]]
+            for rank in ranks_sorted:
+                if rank not in hand:
+                    hand.append(rank)
+                    if len(hand) == 5:
+                        return Combination(2, hand)
+    return None
+
+
 def find_two_pairs(cards: List[Card]):
     ranks = [card.rank for card in cards]
     rank_occurrences = defaultdict()
@@ -31,6 +45,7 @@ def find_two_pairs(cards: List[Card]):
             top_hand.append(rank)
             return Combination(3, top_hand)
     return None
+
 
 def find_three_of_a_kind(cards: List[Card]):
     ranks = [card.rank for card in cards]
