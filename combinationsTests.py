@@ -134,6 +134,30 @@ class MyTestCase(unittest.TestCase):
         result = combinations.find_flush(test_input)
         self.assertEqual(None, result)
 
+    def test_is_straight_flush(self):
+        sh = Suit.hearths
+        ss = Suit.spade
+        # when 5 hearths straight flush then returns combo with kickers ordered by strength
+        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh), Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        result = combinations.find_straight_flush(test_input)
+        self.assertEqual(9, result.strength)
+        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.r1], result.kickers)
+        # when 5 spade straight flush then returns combo with kickers ordered by strength
+        test_input = [Card(Rank.King, ss), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss), Card(Rank.Jack, ss),
+                      Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        result = combinations.find_straight_flush(test_input)
+        self.assertEqual(9, result.strength)
+        self.assertEqual([Rank.King, Rank.Queen, Rank.Jack, Rank.r10, Rank.r9], result.kickers)
+        # when straight, but not flush
+        test_input = [Card(Rank.King, ss), Card(Rank.r9, sh), Card(Rank.r10, ss), Card(Rank.Queen, ss),
+                      Card(Rank.Jack, ss), Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        result = combinations.find_straight_flush(test_input)
+        self.assertEqual(None, result)
+        # when flush, but not straight
+        test_input = [Card(Rank.King, ss), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.r2, ss),
+                      Card(Rank.Jack, ss), Card(Rank.r3, ss), Card(Rank.r4, ss)]
+        result = combinations.find_straight_flush(test_input)
+        self.assertEqual(None, result)
 
 if __name__ == '__main__':
     unittest.main()

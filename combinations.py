@@ -16,18 +16,19 @@ def find_four_of_a_kind(cards: Iterable[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)
     hand = []
-    for i in range(0, len(ranks)-3):
-        if ranks_sorted[i] == ranks_sorted[i+1] == ranks_sorted[i+2] == ranks_sorted[i+3]:
+    for i in range(0, len(ranks) - 3):
+        if ranks_sorted[i] == ranks_sorted[i + 1] == ranks_sorted[i + 2] == ranks_sorted[i + 3]:
             for _ in range(0, 4):
                 hand.append(ranks_sorted[i])
             break
-    if len(hand)!=4:
+    if len(hand) != 4:
         return None
     for rank in ranks_sorted:
         if rank != hand[0]:
             hand.append(rank)
             return Combination(8, hand)
     return None
+
 
 def is_royal_flush(cards: Iterable[Card]):
     high_cards = defaultdict()
@@ -80,4 +81,21 @@ def find_flush(cards: List[Card]):
             sorted_ranks = sorted(grouped_by_suit, reverse=True)
             top_5 = sorted_ranks[:5]
             return Combination(6, top_5)
+    return None
+
+
+def find_straight_flush(cards: List[Card]):
+    sort_by_suit = defaultdict()
+    for card in cards:
+        if card.suit not in sort_by_suit:
+            sort_by_suit[card.suit] = []
+        sort_by_suit[card.suit].append(card.rank)
+    for suit in sort_by_suit:
+        suited_ranks = sort_by_suit[suit]
+        if len(suited_ranks) > 4:
+            sorted_ranks = sorted(suited_ranks, reverse=True)
+            for i in range(0, len(suited_ranks) - 4):
+                if sorted_ranks[i] == (sorted_ranks[i + 1] + 1) == (sorted_ranks[i + 2] + 2) == (
+                        sorted_ranks[i + 3] + 3) == (sorted_ranks[i + 4] + 4):
+                    return Combination(9, sorted_ranks[i:i + 5])
     return None
