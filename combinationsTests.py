@@ -9,16 +9,18 @@ from suit import Suit
 
 class MyTestCase(unittest.TestCase):
     def test_canFindHighCard(self):
-        test_input = [Rank(1), Rank(2), Rank(3), Rank(4), Rank(5), Rank(6), Rank(7), Rank(8), Rank(9), Rank(10),
-                      Rank(11),
-                      Rank(12), Rank(13), Rank(14)]
-        self.assertEqual(combinations.find_high_card(test_input), Rank.Ace)
-        test_input = [Rank(1), Rank(2), Rank(3), Rank(4), Rank(5), Rank(6), Rank(7), Rank(8), Rank(9), Rank(10),
-                      Rank(11),
-                      Rank(12), Rank(13)]
-        self.assertEqual(combinations.find_high_card(test_input), Rank.King)
-        test_input = [Rank(7), Rank(1), Rank(12), Rank(4), Rank(3), Rank(5), Rank(9), Rank(6), Rank(8)]
-        self.assertEqual(combinations.find_high_card(test_input), Rank.Queen)
+        sc = Suit.clubs
+        # 1
+        test_input = [Card(Rank(2), sc), Card(Rank(7), sc), Card(Rank(3), sc), Card(Rank(4), sc), Card(Rank(1), sc),
+                      Card(Rank(6), sc), Card(Rank(5), sc)]
+        result = combinations.find_high_card(test_input)
+        self.assertEqual(1, result.strength)
+        self.assertEqual([Rank(7), Rank(6), Rank(5), Rank(4), Rank(3)], result.kickers)
+        # 2
+        test_input = [Card(Rank(13), sc), Card(Rank(10), sc), Card(Rank(1), sc), Card(Rank(2), sc), Card(Rank(7), sc), Card(Rank(5), sc), Card(Rank(4), sc)]
+        result = combinations.find_high_card(test_input)
+        self.assertEqual(1, result.strength)
+        self.assertEqual([Rank(13), Rank(10), Rank(7), Rank(5), Rank(4)], result.kickers)
 
     def test__find_four_of_a_kind(self):
         sc = Suit.clubs
@@ -28,15 +30,16 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(8, result.strength)
         self.assertEqual([Rank(10), Rank(10), Rank(10), Rank(10), Rank(2)], result.kickers)
         # when 4 of a kind found
-        test_input = [Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(4), sc), Card(Rank(2), sc), Card(Rank(2), sc), Card(Rank(2), sc), Card(Rank(4), sc)]
+        test_input = [Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(4), sc), Card(Rank(2), sc), Card(Rank(2), sc),
+                      Card(Rank(2), sc), Card(Rank(4), sc)]
         result = combinations.find_four_of_a_kind(test_input)
         self.assertEqual(8, result.strength)
         self.assertEqual([Rank(2), Rank(2), Rank(2), Rank(2), Rank(4)], result.kickers)
         # when 4 of a kind not found
-        test_input = [Card(Rank(1), sc), Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(3), sc), Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(2), sc)]
+        test_input = [Card(Rank(1), sc), Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(3), sc), Card(Rank(2), sc),
+                      Card(Rank(1), sc), Card(Rank(2), sc)]
         result = combinations.find_four_of_a_kind(test_input)
         self.assertEqual(None, result)
-
 
     def test__is_royal_flush(self):
         expected = Combination(10, [Rank.Ace, Rank.King, Rank.Queen, Rank.Jack, Rank.r10])

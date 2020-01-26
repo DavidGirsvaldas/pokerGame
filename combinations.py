@@ -6,12 +6,10 @@ from rank import Rank
 from collections import defaultdict
 
 
-def find_high_card(ranks: Iterable[Rank]):
-    max_rank = 0
-    for rank in ranks:
-        if rank.value > max_rank:
-            max_rank = rank
-    return Rank(max_rank)
+def find_high_card(cards: Iterable[Card]):
+    ranks = [card.rank for card in cards]
+    ranks_sorted = sorted(ranks, reverse=True)
+    return Combination(1, ranks_sorted[:5])
 
 
 def find_four_of_a_kind(cards: Iterable[Card]):
