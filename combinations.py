@@ -146,7 +146,7 @@ def find_straight_flush(cards: List[Card]):
     return None
 
 
-def is_royal_flush(cards: Iterable[Card]):
+def find_royal_flush(cards: Iterable[Card]):
     high_cards = defaultdict()
     for card in cards:
         if card.rank.value > 9:
