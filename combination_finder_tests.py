@@ -7,7 +7,7 @@ from rank import Rank
 from suit import Suit
 
 
-class MyTestCase(unittest.TestCase):
+class CombinationFinderTests(unittest.TestCase):
     def test_canFindHighCard(self):
         sc = Suit.clubs
         sd = Suit.diamonds
