@@ -27,15 +27,12 @@ def find_pair(cards: List[Card]):
 
 def find_two_pairs(cards: List[Card]):
     ranks = [card.rank for card in cards]
-    rank_occurrences = defaultdict()
+    rank_occurrences = defaultdict(int)
     hand = []
     for rank in ranks:
-        if rank not in rank_occurrences:
-            rank_occurrences[rank] = 0
         rank_occurrences[rank] += 1
         if rank_occurrences[rank] == 2:
-            hand.append(rank)
-            hand.append(rank)
+            hand += 2 * [rank]
     if len(hand) < 4:
         return None
     sorted_hand = sorted(hand, reverse=True)
@@ -49,14 +46,12 @@ def find_two_pairs(cards: List[Card]):
 
 def find_three_of_a_kind(cards: List[Card]):
     ranks = [card.rank for card in cards]
-    rank_occurrences = defaultdict()
+    rank_occurrences = defaultdict(int)
     for rank in ranks:
-        if rank not in rank_occurrences:
-            rank_occurrences[rank] = 0
         rank_occurrences[rank] += 1
         if rank_occurrences[rank] == 3:
             ranks_sorted = sorted(ranks, reverse=True)
-            hand = [rank, rank, rank]
+            hand = 3 *[rank]
             for sorted_rank in ranks_sorted:
                 if sorted_rank != rank:
                     hand.append(sorted_rank)
@@ -76,10 +71,8 @@ def find_straight(cards: List[Card]):
 
 
 def find_flush(cards: List[Card]):
-    suit_occurrences = defaultdict()
+    suit_occurrences = defaultdict(list)
     for card in cards:
-        if card.suit not in suit_occurrences:
-            suit_occurrences[card.suit] = []
         suit_occurrences[card.suit].append(card.rank)
     for suit in suit_occurrences:
         grouped_by_suit = suit_occurrences[suit]
@@ -96,15 +89,13 @@ def find_full_house(cards: List[Card]):
     ranks_by_strength = sorted(ranks, reverse=True)
     for i in range(0, len(ranks_by_strength) - 2):
         if ranks_by_strength[i] == ranks_by_strength[i + 1] == ranks_by_strength[i + 2]:
-            for _ in range(0, 3):
-                hand.append(ranks_by_strength[i])
+            hand += 3 * [ranks_by_strength[i]]
             break
     if len(hand) == 0:
         return None
     for i in range(0, len(ranks_by_strength) - 1):
         if ranks_by_strength[i] == ranks_by_strength[i + 1] != hand[0]:
-            for _ in range(0, 2):
-                hand.append(ranks_by_strength[i])
+            hand += 2 * [ranks_by_strength[i]]
             break
     if len(hand) == 5:
         return Combination(7, hand)
@@ -117,8 +108,7 @@ def find_four_of_a_kind(cards: Iterable[Card]):
     hand = []
     for i in range(0, len(ranks) - 3):
         if ranks_sorted[i] == ranks_sorted[i + 1] == ranks_sorted[i + 2] == ranks_sorted[i + 3]:
-            for _ in range(0, 4):
-                hand.append(ranks_sorted[i])
+            hand += 4 * [ranks_sorted[i]]
             break
     if len(hand) != 4:
         return None
@@ -130,10 +120,8 @@ def find_four_of_a_kind(cards: Iterable[Card]):
 
 
 def find_straight_flush(cards: List[Card]):
-    sort_by_suit = defaultdict()
+    sort_by_suit = defaultdict(list)
     for card in cards:
-        if card.suit not in sort_by_suit:
-            sort_by_suit[card.suit] = []
         sort_by_suit[card.suit].append(card.rank)
     for suit in sort_by_suit:
         suited_ranks = sort_by_suit[suit]
@@ -147,11 +135,9 @@ def find_straight_flush(cards: List[Card]):
 
 
 def find_royal_flush(cards: Iterable[Card]):
-    high_cards = defaultdict()
+    high_cards = defaultdict(dict)
     for card in cards:
         if card.rank.value > 9:
-            if card.suit not in high_cards:
-                high_cards[card.suit] = defaultdict()
             high_cards[card.suit][card.rank.value] = card.rank.value
     for suit in high_cards:
         contains_royal_flush = True
