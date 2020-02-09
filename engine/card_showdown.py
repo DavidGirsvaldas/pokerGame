@@ -10,7 +10,7 @@ from engine import combination_finder
 def find_winner(players: List[Player], common_cards: List[Card]):
     combo_by_player = defaultdict()
     for player in players:
-        combo_by_player[player] = combination_finder.find(player.hand + common_cards)
+        combo_by_player[player] = combination_finder.find(player.cards + common_cards)
 
     highest_combo = Combination(0, [])
     for combo in combo_by_player.values():
