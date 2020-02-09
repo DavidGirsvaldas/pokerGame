@@ -14,7 +14,7 @@ def find_high_card(cards: Iterable[Card]):
 def find_pair(cards: List[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)
-    for i in range(0, len(ranks_sorted) - 1):
+    for i in range(len(ranks_sorted) - 1):
         if ranks_sorted[i] == ranks_sorted[i + 1]:
             hand = [ranks_sorted[i], ranks_sorted[i]]
             for rank in ranks_sorted:
@@ -22,7 +22,6 @@ def find_pair(cards: List[Card]):
                     hand.append(rank)
                     if len(hand) == 5:
                         return Combination(2, hand)
-    return None
 
 
 def find_two_pairs(cards: List[Card]):
@@ -34,14 +33,13 @@ def find_two_pairs(cards: List[Card]):
         if rank_occurrences[rank] == 2:
             hand += 2 * [rank]
     if len(hand) < 4:
-        return None
+        return
     sorted_hand = sorted(hand, reverse=True)
     top_hand = sorted_hand[:4]
     for rank in sorted(ranks, reverse=True):
         if rank not in top_hand:
             top_hand.append(rank)
             return Combination(3, top_hand)
-    return None
 
 
 def find_three_of_a_kind(cards: List[Card]):
@@ -51,23 +49,21 @@ def find_three_of_a_kind(cards: List[Card]):
         rank_occurrences[rank] += 1
         if rank_occurrences[rank] == 3:
             ranks_sorted = sorted(ranks, reverse=True)
-            hand = 3 *[rank]
+            hand = 3 * [rank]
             for sorted_rank in ranks_sorted:
                 if sorted_rank != rank:
                     hand.append(sorted_rank)
                     if len(hand) == 5:
                         return Combination(4, hand)
-    return None
 
 
 def find_straight(cards: List[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)
-    for i in range(0, len(ranks_sorted) - 4):
+    for i in range(len(ranks_sorted) - 4):
         if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (
                 ranks_sorted[i + 4] + 4):
             return Combination(5, ranks_sorted[i:i + 5])
-    return None
 
 
 def find_flush(cards: List[Card]):
@@ -80,43 +76,40 @@ def find_flush(cards: List[Card]):
             sorted_ranks = sorted(grouped_by_suit, reverse=True)
             top_5 = sorted_ranks[:5]
             return Combination(6, top_5)
-    return None
 
 
 def find_full_house(cards: List[Card]):
     ranks = [card.rank for card in cards]
     hand = []
     ranks_by_strength = sorted(ranks, reverse=True)
-    for i in range(0, len(ranks_by_strength) - 2):
+    for i in range(len(ranks_by_strength) - 2):
         if ranks_by_strength[i] == ranks_by_strength[i + 1] == ranks_by_strength[i + 2]:
             hand += 3 * [ranks_by_strength[i]]
             break
     if len(hand) == 0:
-        return None
-    for i in range(0, len(ranks_by_strength) - 1):
+        return
+    for i in range(len(ranks_by_strength) - 1):
         if ranks_by_strength[i] == ranks_by_strength[i + 1] != hand[0]:
             hand += 2 * [ranks_by_strength[i]]
             break
     if len(hand) == 5:
         return Combination(7, hand)
-    return None
 
 
 def find_four_of_a_kind(cards: Iterable[Card]):
     ranks = [card.rank for card in cards]
     ranks_sorted = sorted(ranks, reverse=True)
     hand = []
-    for i in range(0, len(ranks) - 3):
+    for i in range(len(ranks) - 3):
         if ranks_sorted[i] == ranks_sorted[i + 1] == ranks_sorted[i + 2] == ranks_sorted[i + 3]:
             hand += 4 * [ranks_sorted[i]]
             break
     if len(hand) != 4:
-        return None
+        return
     for rank in ranks_sorted:
         if rank != hand[0]:
             hand.append(rank)
             return Combination(8, hand)
-    return None
 
 
 def find_straight_flush(cards: List[Card]):
@@ -127,11 +120,10 @@ def find_straight_flush(cards: List[Card]):
         suited_ranks = sort_by_suit[suit]
         if len(suited_ranks) > 4:
             sorted_ranks = sorted(suited_ranks, reverse=True)
-            for i in range(0, len(suited_ranks) - 4):
+            for i in range(len(suited_ranks) - 4):
                 if sorted_ranks[i] == (sorted_ranks[i + 1] + 1) == (sorted_ranks[i + 2] + 2) == (
                         sorted_ranks[i + 3] + 3) == (sorted_ranks[i + 4] + 4):
                     return Combination(9, sorted_ranks[i:i + 5])
-    return None
 
 
 def find_royal_flush(cards: Iterable[Card]):
@@ -147,4 +139,3 @@ def find_royal_flush(cards: Iterable[Card]):
                 break
         if contains_royal_flush:
             return Combination(10, sorted(high_cards[suit], reverse=True))
-    return None
