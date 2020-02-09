@@ -1,5 +1,6 @@
 import unittest
 
+from engine.action import Action
 from engine.deck import Deck
 from engine.player import Player
 from engine.dealer import Dealer
@@ -120,7 +121,7 @@ class TestDealer(unittest.TestCase):
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
-        pot = dealer.setup_preflop()
+        pot = dealer.setup_preflop(small_blind_size)
         self.assertEqual(initial_stack, player1.stack)
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - small_blind_size * 2, player3.stack)
@@ -130,3 +131,63 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(2, len(player1.cards))
         self.assertEqual(2, len(player2.cards))
         self.assertEqual(2, len(player3.cards))
+
+    def test_preflop_round__when_all_fold(self):
+        initial_stack = 100
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: Action.ACTION_FOLD
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: Action.ACTION_FOLD
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: Action.ACTION_FOLD
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round()
+        self.assertEqual(player3, winner)
+        self.assertEqual(105, player3.stack)
+
+    def test_preflop_round__when_only_small_blind_plays(self):
+        initial_stack = 100
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: Action.ACTION_FOLD
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: Action.ACTION_CALL
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: Action.ACTION_FOLD
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round()
+        self.assertEqual(player2, winner)
+        self.assertEqual(110, player2.stack)
+
+    def test_preflop_round__when_only_utg_plays(self):
+        initial_stack = 100
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: Action.ACTION_CALL
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: Action.ACTION_FOLD
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: Action.ACTION_FOLD
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round()
+        self.assertEqual(player1, winner)
+        self.assertEqual(115, player1.stack)
