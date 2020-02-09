@@ -6,6 +6,7 @@ from engine.pot import Pot
 class Dealer:
 
     def __init__(self, deck, seating):
+        self.community_cards = None
         self.deck = deck
         self.seating = seating
         self.pot = None
@@ -36,23 +37,34 @@ class Dealer:
         self.deck.shuffle()
         self.deal()
 
-    def preflop_round(self):
+    def preflop_round(self, small_blind_size):
+        def conclude_preflop(winner):
+            if winner:
+                winner = self.pot.players[0]
+                winner.stack += self.pot.size
+                return winner
+            else:
+                self.community_cards = self.deck.draw(3)
+
         bb_player = self.seating.big_blind_player()
         current_player = bb_player
-        round_over = False
-        while not round_over:
+        while True:
             current_player = self.seating.next_player_after_player(current_player)
             player_action = current_player.act(None)
             if player_action is Action.ACTION_FOLD:
-                current_player.cards = None
                 if current_player in self.pot.players:
                     self.pot.players.remove(current_player)
-                if len(self.pot.players) is 1:
-                    winner = self.pot.players[0]
-                    winner.stack += self.pot.size
-                    return winner
             if player_action is Action.ACTION_CALL:
+                if current_player is self.seating.small_blind_player():
+                    current_player.stack -= small_blind_size
+                    self.pot.size += small_blind_size
+                else:
+                    big_blind_size = small_blind_size *2
+                    current_player.stack -= big_blind_size
+                    self.pot.size += big_blind_size
                 if current_player not in self.pot.players:
                     self.pot.players.append(current_player)
+            if len(self.pot.players) is 1:
+                return conclude_preflop(self.pot.players[0])
             if current_player is bb_player:
-                return
+                return conclude_preflop(None)

@@ -148,7 +148,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round()
+        winner = dealer.preflop_round(small_blind_size)
         self.assertEqual(player3, winner)
         self.assertEqual(105, player3.stack)
 
@@ -168,7 +168,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round()
+        winner = dealer.preflop_round(small_blind_size)
         self.assertEqual(player2, winner)
         self.assertEqual(110, player2.stack)
 
@@ -188,6 +188,35 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round()
+        winner = dealer.preflop_round(small_blind_size)
         self.assertEqual(player1, winner)
         self.assertEqual(115, player1.stack)
+
+    def test_preflop_round__when_multiple_people_call(self):
+        initial_stack = 100
+        small_blind_size = 5
+        big_blind_size = small_blind_size *2
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: Action.ACTION_CALL
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: Action.ACTION_FOLD
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: Action.ACTION_CHECK
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round(small_blind_size)
+        self.assertEqual(None, winner)
+        self.assertTrue(player1 in dealer.pot.players)
+        self.assertTrue(player2 not in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
+        self.assertEqual(initial_stack - big_blind_size, player1.stack)
+        self.assertEqual(initial_stack - small_blind_size, player2.stack)
+        self.assertEqual(initial_stack - big_blind_size, player3.stack)
+        self.assertEqual(big_blind_size * 2 + small_blind_size, dealer.pot.size)
+        self.assertEqual(3, len(dealer.community_cards))
+        self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
