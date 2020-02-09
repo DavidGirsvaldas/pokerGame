@@ -3,7 +3,9 @@ from typing import List
 
 
 class Player:
-    hand: List[Card]
 
-    def __init__(self, cards: List[Card]):
+    def __init__(self):
+        self.hand = []
+
+    def receive_cards(self, cards: List[Card]):
         self.hand = cards

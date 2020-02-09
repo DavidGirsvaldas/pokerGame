@@ -16,3 +16,6 @@ class Deck:
 
     def shuffle(self):
         random.shuffle(self.cards)
+
+    def draw(self, count):
+        return [self.cards.pop(i) for i in range(count)]

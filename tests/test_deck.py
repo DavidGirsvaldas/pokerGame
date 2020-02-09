@@ -5,13 +5,13 @@ from engine.deck import Deck
 
 
 class DeckTests(unittest.TestCase):
+    deck_size = 56
 
     def test_init_deck(self):
         deck = Deck()
         deck.initialize()
-        deck_size = 56
         unique_cards = set(deck.cards)
-        self.assertEqual(deck_size, len(unique_cards))
+        self.assertEqual(self.deck_size, len(unique_cards))
         for card in unique_cards:
             self.assertTrue(isinstance(card, Card))
 
