@@ -1,10 +1,10 @@
 import unittest
 
-import card_showdown
-from card import Card
-from player import Player
-from rank import Rank
-from suit import Suit
+from engine import card_showdown
+from engine.card import Card
+from engine.player import Player
+from engine.rank import Rank
+from engine.suit import Suit
 
 
 class CardShowdownTests(unittest.TestCase):

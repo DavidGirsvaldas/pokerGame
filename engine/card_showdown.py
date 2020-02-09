@@ -1,10 +1,10 @@
 from collections import defaultdict
 from typing import List
 
-from card import Card
-from combination import Combination
-from player import Player
-import combination_finder
+from engine.card import Card
+from engine.combination import Combination
+from engine.player import Player
+from engine import combination_finder
 
 
 def find_winner(players: List[Player], common_cards: List[Card]):

@@ -1,4 +1,4 @@
-from card import Card
+from engine.card import Card
 from typing import List
 
 

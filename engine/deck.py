@@ -1,6 +1,6 @@
-from rank import Rank
-from suit import Suit
-from card import Card
+from engine.rank import Rank
+from engine.suit import Suit
+from engine.card import Card
 
 
 class Deck:
