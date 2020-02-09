@@ -1,6 +1,7 @@
 from engine.rank import Rank
 from engine.suit import Suit
 from engine.card import Card
+import random
 
 
 class Deck:
@@ -8,7 +9,10 @@ class Deck:
         self.cards = None
 
     def initialize(self):
-        self.cards = set()
+        self.cards = []
         for suit in Suit:
             for rank in Rank:
-                self.cards.add(Card(rank, suit))
+                self.cards.append(Card(rank, suit))
+
+    def shuffle(self):
+        random.shuffle(self.cards)
