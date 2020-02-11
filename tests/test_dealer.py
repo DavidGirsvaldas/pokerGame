@@ -137,13 +137,13 @@ class TestDealer(unittest.TestCase):
         small_blind_size = 5
         player1 = Player()
         player1.stack = initial_stack
-        player1.act = lambda x: Action.ACTION_FOLD
+        player1.act = lambda x: (Action.ACTION_FOLD, 0)
         player2 = Player()
         player2.stack = initial_stack
-        player2.act = lambda x: Action.ACTION_FOLD
+        player2.act = lambda x: (Action.ACTION_FOLD, 0)
         player3 = Player()
         player3.stack = initial_stack
-        player3.act = lambda x: Action.ACTION_FOLD
+        player3.act = lambda x: (Action.ACTION_FOLD, 0)
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -157,13 +157,13 @@ class TestDealer(unittest.TestCase):
         small_blind_size = 5
         player1 = Player()
         player1.stack = initial_stack
-        player1.act = lambda x: Action.ACTION_FOLD
+        player1.act = lambda x: (Action.ACTION_FOLD, 0)
         player2 = Player()
         player2.stack = initial_stack
-        player2.act = lambda x: Action.ACTION_CALL
+        player2.act = lambda x: (Action.ACTION_CALL, x)
         player3 = Player()
         player3.stack = initial_stack
-        player3.act = lambda x: Action.ACTION_FOLD
+        player3.act = lambda x: (Action.ACTION_FOLD, 0)
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -177,13 +177,13 @@ class TestDealer(unittest.TestCase):
         small_blind_size = 5
         player1 = Player()
         player1.stack = initial_stack
-        player1.act = lambda x: Action.ACTION_CALL
+        player1.act = lambda x: (Action.ACTION_CALL, x)
         player2 = Player()
         player2.stack = initial_stack
-        player2.act = lambda x: Action.ACTION_FOLD
+        player2.act = lambda x: (Action.ACTION_FOLD, 0)
         player3 = Player()
         player3.stack = initial_stack
-        player3.act = lambda x: Action.ACTION_FOLD
+        player3.act = lambda x: (Action.ACTION_FOLD, 0)
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -195,16 +195,16 @@ class TestDealer(unittest.TestCase):
     def test_preflop_round__when_multiple_people_call(self):
         initial_stack = 100
         small_blind_size = 5
-        big_blind_size = small_blind_size *2
+        big_blind_size = small_blind_size * 2
         player1 = Player()
         player1.stack = initial_stack
-        player1.act = lambda x: Action.ACTION_CALL
+        player1.act = lambda x: (Action.ACTION_CALL, x)
         player2 = Player()
         player2.stack = initial_stack
-        player2.act = lambda x: Action.ACTION_FOLD
+        player2.act = lambda x: (Action.ACTION_FOLD, 0)
         player3 = Player()
         player3.stack = initial_stack
-        player3.act = lambda x: Action.ACTION_CHECK
+        player3.act = lambda x: (Action.ACTION_CALL, x)
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -218,5 +218,34 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - big_blind_size, player3.stack)
         self.assertEqual(big_blind_size * 2 + small_blind_size, dealer.pot.size)
+        self.assertEqual(3, len(dealer.community_cards))
+        self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
+
+    def test_preflop_round__when_player_bets__all_calls(self):
+        initial_stack = 100
+        raise_size = 50
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: (Action.ACTION_CALL, x)
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: (Action.ACTION_RAISE, raise_size)
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: (Action.ACTION_CALL, x)
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round(small_blind_size)
+        self.assertEqual(None, winner)
+        self.assertTrue(player1 in dealer.pot.players)
+        self.assertTrue(player2 in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
+        self.assertEqual(initial_stack - raise_size, player1.stack)
+        self.assertEqual(initial_stack - raise_size, player2.stack)
+        self.assertEqual(initial_stack - raise_size, player3.stack)
+        self.assertEqual(raise_size * 3, dealer.pot.size)
         self.assertEqual(3, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
