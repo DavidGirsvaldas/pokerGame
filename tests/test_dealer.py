@@ -223,14 +223,56 @@ class TestDealer(unittest.TestCase):
 
     def test_preflop_round__when_player_bets__all_calls(self):
         initial_stack = 100
-        raise_size = 50
+        bet_size = 50
         small_blind_size = 5
         player1 = Player()
         player1.stack = initial_stack
         player1.act = lambda x: (Action.ACTION_CALL, x)
         player2 = Player()
         player2.stack = initial_stack
-        player2.act = lambda x: (Action.ACTION_RAISE, raise_size)
+        player2.act = lambda x: (Action.ACTION_RAISE, bet_size)
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: (Action.ACTION_CALL, x)
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round(small_blind_size)
+        self.assertEqual(None, winner)
+        self.assertTrue(player1 in dealer.pot.players)
+        self.assertTrue(player2 in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
+        self.assertEqual(initial_stack - bet_size, player1.stack)
+        self.assertEqual(initial_stack - bet_size, player2.stack)
+        self.assertEqual(initial_stack - bet_size, player3.stack)
+        self.assertEqual(bet_size * 3, dealer.pot.size)
+        self.assertEqual(3, len(dealer.community_cards))
+        self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
+
+    def test_preflop_round__when_player_raises__all_calls(self):
+        initial_stack = 100
+        bet_size = 50
+        raise_size = bet_size +10
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+
+        def call_raise(amount):
+            if amount == small_blind_size * 2:
+                return Action.ACTION_CALL, amount
+            return Action.ACTION_RAISE, raise_size
+
+        player1.act = call_raise
+        player2 = Player()
+        player2.stack = initial_stack
+
+        def raise_call(amount):
+            if amount == small_blind_size * 2:
+                return Action.ACTION_RAISE, bet_size
+            return Action.ACTION_CALL, amount
+
+        player2.act = raise_call
         player3 = Player()
         player3.stack = initial_stack
         player3.act = lambda x: (Action.ACTION_CALL, x)

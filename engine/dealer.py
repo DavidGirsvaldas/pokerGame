@@ -54,15 +54,15 @@ class Dealer:
         def round_of_calls_to_make(starting_player, include_starting_player, chips_in_pot_per_player):
             current_player = self.seating.next_player_after_player(starting_player)
             while True:
-                amount_to_call = chips_in_pot_per_player - current_player.money_in_pot
-                player_action, new_amount_to_call = current_player.act(amount_to_call)
+                player_action, new_amount_to_call = current_player.act(chips_in_pot_per_player)
                 if player_action is Action.ACTION_FOLD:
                     if current_player in self.pot.players:
                         self.pot.players.remove(current_player)
                 if player_action is Action.ACTION_CALL:
-                    current_player.stack -= new_amount_to_call
-                    current_player.money_in_pot += new_amount_to_call
-                    self.pot.size += new_amount_to_call
+                    amount_to_add = new_amount_to_call - current_player.money_in_pot
+                    current_player.stack -= amount_to_add
+                    current_player.money_in_pot += amount_to_add
+                    self.pot.size += amount_to_add
                     if current_player not in self.pot.players:
                         self.pot.players.append(current_player)
                 if player_action is Action.ACTION_RAISE:
@@ -70,6 +70,7 @@ class Dealer:
                     current_player.stack -= amount_to_add
                     current_player.money_in_pot += amount_to_add
                     self.pot.size += amount_to_add
+                    # bug here, player who raises not added to pot
                     return round_of_calls_to_make(current_player, False, new_amount_to_call)
                 if len(self.pot.players) == 1:
                     return conclude_preflop(self.pot.players[0])
