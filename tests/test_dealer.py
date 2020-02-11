@@ -250,6 +250,35 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(3, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
 
+    def test_preflop_round__when_first_player_bets__all_calls(self):
+        initial_stack = 100
+        bet_size = 50
+        small_blind_size = 5
+        player1 = Player()
+        player1.stack = initial_stack
+        player1.act = lambda x: (Action.ACTION_RAISE, bet_size)
+        player2 = Player()
+        player2.stack = initial_stack
+        player2.act = lambda x: (Action.ACTION_CALL, x)
+        player3 = Player()
+        player3.stack = initial_stack
+        player3.act = lambda x: (Action.ACTION_CALL, x)
+        seating = Seating([player1, player2, player3])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round(small_blind_size)
+        self.assertEqual(None, winner)
+        self.assertTrue(player1 in dealer.pot.players)
+        self.assertTrue(player2 in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
+        self.assertEqual(initial_stack - bet_size, player1.stack)
+        self.assertEqual(initial_stack - bet_size, player2.stack)
+        self.assertEqual(initial_stack - bet_size, player3.stack)
+        self.assertEqual(bet_size * 3, dealer.pot.size)
+        self.assertEqual(3, len(dealer.community_cards))
+        self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
+
     def test_preflop_round__when_player_raises__all_calls(self):
         initial_stack = 100
         bet_size = 50

@@ -70,7 +70,8 @@ class Dealer:
                     current_player.stack -= amount_to_add
                     current_player.money_in_pot += amount_to_add
                     self.pot.size += amount_to_add
-                    # bug here, player who raises not added to pot
+                    if current_player not in self.pot.players:
+                        self.pot.players.append(current_player)
                     return round_of_calls_to_make(current_player, False, new_amount_to_call)
                 if len(self.pot.players) == 1:
                     return conclude_preflop(self.pot.players[0])
