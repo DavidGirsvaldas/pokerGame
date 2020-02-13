@@ -4,6 +4,7 @@ from engine.action import Action
 from engine.deck import Deck
 from engine.player import Player
 from engine.dealer import Dealer
+from engine.pot import Pot
 from engine.seating import Seating
 from tests.test_deck import DeckTests
 
@@ -37,19 +38,21 @@ class TestDealer(unittest.TestCase):
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
-        pot_size = dealer.collect_blinds(small_blind_size)
+        dealer.pot = Pot()
+        dealer.collect_blinds(small_blind_size)
         self.assertEqual(initial_stack, player1.stack)
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - big_blind_size, player3.stack)
-        self.assertEqual(big_blind_size + small_blind_size, pot_size.size)
+        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.size)
         dealer.move_button()
-        pot_size = dealer.collect_blinds(small_blind_size)
+        dealer.pot = Pot()
+        dealer.collect_blinds(small_blind_size)
         self.assertEqual(initial_stack - big_blind_size, player1.stack)
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - big_blind_size - small_blind_size, player3.stack)
-        self.assertEqual(big_blind_size + small_blind_size, pot_size.size)
-        self.assertTrue(player1 in pot_size.players)
-        self.assertTrue(player3 in pot_size.players)
+        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.size)
+        self.assertTrue(player1 in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
 
     def test_collect_blinds__when_player_dont_have_enough_chips(self):
         initial_stack = 100
@@ -64,13 +67,14 @@ class TestDealer(unittest.TestCase):
         seating = Seating([player1, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
-        pot_size = dealer.collect_blinds(small_blind_size)
+        dealer.pot = Pot()
+        dealer.collect_blinds(small_blind_size)
         self.assertEqual(initial_stack, player1.stack)
         self.assertEqual(0, player2.stack)
         self.assertEqual(0, player3.stack)
-        self.assertEqual(13, pot_size.size)
-        self.assertTrue(player2 in pot_size.players)
-        self.assertTrue(player3 in pot_size.players)
+        self.assertEqual(13, dealer.pot.size)
+        self.assertTrue(player2 in dealer.pot.players)
+        self.assertTrue(player3 in dealer.pot.players)
 
     def test_move_button__when2players(self):
         player1 = Player()

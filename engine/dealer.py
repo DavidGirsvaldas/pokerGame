@@ -25,19 +25,24 @@ class Dealer:
         sb_player = self.seating.small_blind_player()
         bb_player = self.seating.big_blind_player()
         available_size_of_small_blind = min(small_blind_size, sb_player.stack)
+        self.take_chips(sb_player, available_size_of_small_blind)
         available_size_of_big_blind = min(small_blind_size * 2, bb_player.stack)
-        sb_player.stack -= available_size_of_small_blind
-        sb_player.money_in_pot = available_size_of_small_blind
-        bb_player.stack -= available_size_of_big_blind
-        bb_player.money_in_pot = available_size_of_big_blind
-        return Pot(available_size_of_small_blind + available_size_of_big_blind, [sb_player, bb_player])
+        self.take_chips(bb_player, available_size_of_big_blind)
 
     def setup_preflop(self, small_blind_size):
-        self.pot = self.collect_blinds(small_blind_size)
+        self.pot = Pot()
+        self.collect_blinds(small_blind_size)
         self.deck = Deck()
         self.deck.initialize()
         self.deck.shuffle()
         self.deal()
+
+    def take_chips(self, player, amount):
+        player.stack -= amount
+        player.money_in_pot += amount
+        self.pot.size += amount
+        if player not in self.pot.players:
+            self.pot.players.append(player)
 
     def preflop_round(self, small_blind_size):
         def conclude_preflop(winner):
@@ -60,18 +65,10 @@ class Dealer:
                         self.pot.players.remove(current_player)
                 if player_action is Action.ACTION_CALL:
                     amount_to_add = new_amount_to_call - current_player.money_in_pot
-                    current_player.stack -= amount_to_add
-                    current_player.money_in_pot += amount_to_add
-                    self.pot.size += amount_to_add
-                    if current_player not in self.pot.players:
-                        self.pot.players.append(current_player)
+                    self.take_chips(current_player, amount_to_add)
                 if player_action is Action.ACTION_RAISE:
                     amount_to_add = new_amount_to_call - current_player.money_in_pot
-                    current_player.stack -= amount_to_add
-                    current_player.money_in_pot += amount_to_add
-                    self.pot.size += amount_to_add
-                    if current_player not in self.pot.players:
-                        self.pot.players.append(current_player)
+                    self.take_chips(current_player, amount_to_add)
                     return round_of_calls_to_make(current_player, False, new_amount_to_call)
                 if len(self.pot.players) == 1:
                     return conclude_preflop(self.pot.players[0])
@@ -80,6 +77,5 @@ class Dealer:
                 current_player = self.seating.next_player_after_player(current_player)
                 if current_player is starting_player and not include_starting_player:
                     return conclude_preflop(None)
-
 
         return round_of_calls_to_make(bb_player, True, amount_to_match)

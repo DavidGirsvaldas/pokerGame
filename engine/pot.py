@@ -1,5 +1,5 @@
 class Pot:
 
-    def __init__(self, size, players):
-        self.size= size
-        self.players = players
+    def __init__(self):
+        self.size= 0
+        self.players = []
