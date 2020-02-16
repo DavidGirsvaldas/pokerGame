@@ -365,16 +365,16 @@ class TestDealer(unittest.TestCase):
 
     def test_playing_flop__when_player_bets__all_calls(self):
         initial_stack = 100
-        bet_size = 40
         small_blind_size = 10
         big_blind_size = small_blind_size * 2
+        bet_size = big_blind_size + 20
         button_player = self.setup_new_player(initial_stack)
         sb_player = self.setup_new_player(initial_stack)
         bb_player = self.setup_new_player(initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
         button_player.act = self.action_check_call
-        sb_player.act = self.action_raise(bet_size + big_blind_size)
+        sb_player.act = self.action_raise(bet_size)
         bb_player.act = self.action_check_call
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
@@ -388,11 +388,18 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(4, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(players) * 2 - 4, len(dealer.deck.cards))
 
-    def test_playing_flop__when_player_bets__one_folds_another_calls(self):
+    def test_playing_flop__when_player_bets_20__one_folds_another_calls(self):
+        self.execute_test_of_player_betting_post_flop(20)
+
+    # todo can this be made into test case?
+    def test_playing_flop__when_player_bets_50__one_folds_another_calls(self):
+        self.execute_test_of_player_betting_post_flop(50)
+
+    def execute_test_of_player_betting_post_flop(self, bet_amount):
         initial_stack = 100
         small_blind_size = 10
         big_blind_size = small_blind_size * 2
-        bet_size = 40
+        bet_size = big_blind_size + bet_amount
         button_player = self.setup_new_player(initial_stack)
         sb_player = self.setup_new_player(initial_stack)
         bb_player = self.setup_new_player(initial_stack)

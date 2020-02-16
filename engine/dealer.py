@@ -84,7 +84,7 @@ class Dealer:
         return round_of_calls_to_make(bb_player, True, amount_to_match)
 
     def play_flop(self):
-        self.add_community_cards(1)
+        self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]
         player = last_player_to_go
         for i in range(3):
@@ -98,16 +98,16 @@ class Dealer:
                     winner.stack += self.pot.size
                     return winner
             if action == Action.ACTION_RAISE:
-                player.stack -= 20
-                self.pot.size += 20
+                player.stack -= amount - 20
+                self.pot.size += amount - 20
                 for next_player in self.seating.players:
                     if next_player != player:
                         p_action, p_amount = next_player.act(None)
                         if p_action == Action.ACTION_FOLD:
                             self.pot.players.remove(next_player)
                         else:
-                            next_player.stack -= 20
-                            self.pot.size += 20
+                            next_player.stack -= amount - 20
+                            self.pot.size += amount - 20
                         if len(self.pot.players) == 1:
                             winner = self.pot.players[0]
                             winner.stack += self.pot.size
