@@ -363,9 +363,14 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(4, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(players) * 2 - 4, len(dealer.deck.cards))
 
-    def test_playing_flop__when_player_bets__all_calls(self):
+    def test_playing_flop__when_small_blind_is_10_and_player_bets__all_calls(self):
+        self.execute_test_of_player_betting_post_flop_and_all_calling(10)
+
+    def test_playing_flop__when_small_blind_is_15_and_player_bets__all_calls(self):
+        self.execute_test_of_player_betting_post_flop_and_all_calling(15)
+
+    def execute_test_of_player_betting_post_flop_and_all_calling(self, small_blind_size):
         initial_stack = 100
-        small_blind_size = 10
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 20
         button_player = self.setup_new_player(initial_stack)

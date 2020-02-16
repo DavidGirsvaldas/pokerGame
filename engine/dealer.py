@@ -98,17 +98,18 @@ class Dealer:
                     winner.stack += self.pot.size
                     return winner
             if action == Action.ACTION_RAISE:
-                player.stack -= amount - 20
-                self.pot.size += amount - 20
+                player.stack -= amount - player.money_in_pot
+                self.pot.size += amount - player.money_in_pot
                 for next_player in self.seating.players:
                     if next_player != player:
                         p_action, p_amount = next_player.act(None)
                         if p_action == Action.ACTION_FOLD:
                             self.pot.players.remove(next_player)
                         else:
-                            next_player.stack -= amount - 20
-                            self.pot.size += amount - 20
+                            next_player.stack -= amount - player.money_in_pot
+                            self.pot.size += amount - player.money_in_pot
                         if len(self.pot.players) == 1:
                             winner = self.pot.players[0]
                             winner.stack += self.pot.size
                             return winner
+
