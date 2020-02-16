@@ -48,14 +48,6 @@ class Dealer:
             self.pot.players.append(player)
 
     def preflop_round(self, small_blind_size):
-        def conclude_preflop(winner):
-            if winner:
-                winner = self.pot.players[0]
-                winner.stack += self.pot.size
-                return winner
-            else:
-                self.add_community_cards(3)
-
         bb_player = self.seating.big_blind_player()
         amount_to_match = small_blind_size * 2
 
@@ -64,8 +56,7 @@ class Dealer:
             while True:
                 player_action, new_amount_to_call = current_player.act(chips_in_pot_per_player)
                 if player_action is Action.ACTION_FOLD:
-                    if current_player in self.pot.players:
-                        self.pot.players.remove(current_player)
+                    self.fold_player(current_player)
                 if player_action is Action.ACTION_CALL:
                     amount_to_add = new_amount_to_call - current_player.money_in_pot
                     self.take_chips(current_player, amount_to_add)
@@ -73,13 +64,15 @@ class Dealer:
                     amount_to_add = new_amount_to_call - current_player.money_in_pot
                     self.take_chips(current_player, amount_to_add)
                     return round_of_calls_to_make(current_player, False, new_amount_to_call)
-                if len(self.pot.players) == 1:
-                    return conclude_preflop(self.pot.players[0])
+                if self.is_winner_determined():
+                    return self.award_winner()
                 if current_player is starting_player:
-                    return conclude_preflop(None)
+                    self.add_community_cards(3)
+                    return
                 current_player = self.seating.next_player_after_player(current_player)
                 if current_player is starting_player and not include_starting_player:
-                    return conclude_preflop(None)
+                    self.add_community_cards(3)
+                    return
 
         return round_of_calls_to_make(bb_player, True, amount_to_match)
 
@@ -87,29 +80,35 @@ class Dealer:
         self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]
         player = last_player_to_go
-        for i in range(3):
+        for i in range(3): # todo remvoe assumption is always 3 players
             player = self.seating.next_player_after_player(player)
-            action, amount = player.act(None)
+            action, amount = player.act(9999)
             if action == Action.ACTION_FOLD:
-                if player in self.pot.players:
-                    self.pot.players.remove(player)
-                if len(self.pot.players) == 1:
-                    winner = self.pot.players[0]
-                    winner.stack += self.pot.size
-                    return winner
+                self.fold_player(player)
+                if self.is_winner_determined():
+                    return self.award_winner()
             if action == Action.ACTION_RAISE:
                 player.stack -= amount - player.money_in_pot
                 self.pot.size += amount - player.money_in_pot
                 for next_player in self.seating.players:
                     if next_player != player:
-                        p_action, p_amount = next_player.act(None)
+                        p_action, p_amount = next_player.act(amount)
                         if p_action == Action.ACTION_FOLD:
-                            self.pot.players.remove(next_player)
+                            self.fold_player(next_player)
                         else:
                             next_player.stack -= amount - player.money_in_pot
                             self.pot.size += amount - player.money_in_pot
-                        if len(self.pot.players) == 1:
-                            winner = self.pot.players[0]
-                            winner.stack += self.pot.size
-                            return winner
+                        if self.is_winner_determined():
+                            return self.award_winner()
 
+    def is_winner_determined(self):
+        return len(self.pot.players) == 1
+
+    def award_winner(self):
+        winner = self.pot.players[0]
+        winner.stack += self.pot.size
+        return winner
+
+    def fold_player(self, player):
+        if player in self.pot.players:
+            self.pot.players.remove(player)
