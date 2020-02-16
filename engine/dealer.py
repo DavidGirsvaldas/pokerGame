@@ -6,7 +6,7 @@ from engine.pot import Pot
 class Dealer:
 
     def __init__(self, deck, seating):
-        self.community_cards = None
+        self.community_cards = []
         self.deck = deck
         self.seating = seating
         self.pot = None
@@ -37,6 +37,9 @@ class Dealer:
         self.deck.shuffle()
         self.deal()
 
+    def add_community_cards(self, card_count):
+        self.community_cards += self.deck.draw(card_count)
+
     def take_chips(self, player, amount):
         player.stack -= amount
         player.money_in_pot += amount
@@ -51,7 +54,7 @@ class Dealer:
                 winner.stack += self.pot.size
                 return winner
             else:
-                self.community_cards = self.deck.draw(3)
+                self.add_community_cards(3)
 
         bb_player = self.seating.big_blind_player()
         amount_to_match = small_blind_size * 2
@@ -79,3 +82,20 @@ class Dealer:
                     return conclude_preflop(None)
 
         return round_of_calls_to_make(bb_player, True, amount_to_match)
+
+    def play_flop(self):
+        action, amount = self.seating.players[0].act(None)
+        if action == Action.ACTION_FOLD:
+            player = self.seating.players[0]
+            player.stack += self.pot.size
+            return player
+        action, amount = self.seating.players[1].act(None)
+        if action == Action.ACTION_RAISE:
+            for player in self.seating.players:
+                p_action, p_amount = player.act(None)
+                if p_action == Action.ACTION_FOLD:
+                    self.pot.players.remove(player)
+                else:
+                    player.stack -= 20
+                    self.pot.size += 20
+        self.add_community_cards(1)
