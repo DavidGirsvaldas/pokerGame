@@ -21,9 +21,9 @@ class CardShowdownTests(unittest.TestCase):
     def test_find_winner__when3players__returns_winner(self):
         common_cards = [Card(Rank.r10, Suit.hearths), Card(Rank.Jack, Suit.diamonds), Card(Rank.Jack, Suit.diamonds),
                         Card(Rank.r2, Suit.spade), Card(Rank.r5, Suit.clubs)]
-        player1 = self.init_test_player([Card(Rank.r4, Suit.hearths), Card(Rank.r3, Suit.clubs)])  # has pair
-        player2 = self.init_test_player([Card(Rank.Ace, Suit.hearths), Card(Rank.King, Suit.spade)])  # has pair with highest kicker
-        player3 = self.init_test_player([Card(Rank.Ace, Suit.spade), Card(Rank.r1, Suit.clubs)])  # has pair
+        player1 = self.init_test_player([Card(Rank.r4, Suit.hearths), Card(Rank.r3, Suit.clubs)])  # has pair of Jacks with kicker 10
+        player2 = self.init_test_player([Card(Rank.Ace, Suit.hearths), Card(Rank.King, Suit.spade)])  # has pair of Jacks with kickers Ace, King
+        player3 = self.init_test_player([Card(Rank.Ace, Suit.spade), Card(Rank.r3, Suit.clubs)])  # has pair of Jacks with kickers Ace, 10
         result = card_showdown.find_winner([player1, player2, player3], common_cards)
         self.assertEqual(1, len(result))
         self.assertIn(player2, result)

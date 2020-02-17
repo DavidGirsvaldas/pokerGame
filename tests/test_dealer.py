@@ -36,6 +36,14 @@ class TestDealer(unittest.TestCase):
 
         return raise_call
 
+    def action_bet_fold(self, new_required_total_player_contribution_to_pot):
+        def raise_fold(amount):
+            if amount < new_required_total_player_contribution_to_pot:
+                return Action.ACTION_RAISE, new_required_total_player_contribution_to_pot
+            return Action.ACTION_FOLD, 0
+
+        return raise_fold
+
     def test_deal(self):
         player1 = Player()
         player2 = Player()
@@ -460,6 +468,27 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(raise_size * 2 + big_blind_size, dealer.pot.size)
         self.assertEqual(4, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(players) * 2 - 4, len(dealer.deck.cards))
+
+    def test_playing_flop_when_player_raises_and_original_betting_player_folds(self):
+        initial_stack = 100
+        small_blind_size = 10
+        big_blind_size = small_blind_size * 2
+        bet_size = big_blind_size + 30
+        raise_size = bet_size + 20
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
+
+        button_player.act = self.action_bet_fold(raise_size)
+        sb_player.act = self.action_raise_call(bet_size)
+        bb_player.act = self.action_fold
+        winner = dealer.play_flop()
+        self.assertEqual(sb_player, winner)
+        self.assertEqual(initial_stack - raise_size, button_player.stack)
+        self.assertEqual(initial_stack + raise_size + big_blind_size, sb_player.stack)
+        self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
 
     def setup_dealer_and_play_preflop_where_everybody_calls(self, players, small_blind_size):
         for player in players:

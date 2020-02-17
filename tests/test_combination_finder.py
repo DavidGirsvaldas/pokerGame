@@ -14,13 +14,13 @@ class CombinationFinderTests(unittest.TestCase):
         ss = Suit.spade
         sh = Suit.hearths
         # 1
-        test_input = [Card(Rank(2), sc), Card(Rank(7), sh), Card(Rank(10), ss), Card(Rank(4), sd), Card(Rank(1), sc),
-                      Card(Rank(6), sc), Card(Rank(5), sc)]
+        test_input = [Card(Rank(2), sc), Card(Rank(10), sh), Card(Rank(13), ss), Card(Rank(4), sd), Card(Rank(3), sc),
+                      Card(Rank(7), sc), Card(Rank(5), sc)]
         result = combination_finder.find(test_input)
         self.assertEqual(1, result.strength)
-        self.assertEqual([Rank(10), Rank(7), Rank(6), Rank(5), Rank(4)], result.kickers)
+        self.assertEqual([Rank(13), Rank(10), Rank(7), Rank(5), Rank(4)], result.kickers)
         # 2
-        test_input = [Card(Rank(13), sc), Card(Rank(10), sd), Card(Rank(1), sh), Card(Rank(2), sd), Card(Rank(7), sc),
+        test_input = [Card(Rank(13), sc), Card(Rank(10), sd), Card(Rank(3), sh), Card(Rank(2), sd), Card(Rank(7), sc),
                       Card(Rank(5), sc), Card(Rank(4), sc)]
         result = combination_finder.find(test_input)
         self.assertEqual(1, result.strength)
@@ -34,7 +34,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual(8, result.strength)
         self.assertEqual([Rank(10), Rank(10), Rank(10), Rank(10), Rank(2)], result.kickers)
         # when 4 of a kind found
-        test_input = [Card(Rank(2), sc), Card(Rank(1), sc), Card(Rank(4), sc), Card(Rank(2), sc), Card(Rank(2), sc),
+        test_input = [Card(Rank(2), sc), Card(Rank(3), sc), Card(Rank(4), sc), Card(Rank(2), sc), Card(Rank(2), sc),
                       Card(Rank(2), sc), Card(Rank(4), sc)]
         result = combination_finder.find(test_input)
         self.assertEqual(8, result.strength)
@@ -79,10 +79,10 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual(expected.kickers, result.kickers)
 
         # when two full houses available then returns the higher
-        test_input = [Card(Rank.r2, sh), Card(Rank.r1, sc), Card(Rank.r2, sc), Card(Rank.r1, sd), Card(Rank.r1, ss),
+        test_input = [Card(Rank.r2, sh), Card(Rank.r3, sc), Card(Rank.r2, sc), Card(Rank.r3, sd), Card(Rank.r3, ss),
                       Card(Rank.r2, sd)]
         result = combination_finder.find(test_input)
-        expected = Combination(7, [Rank.r2, Rank.r2, Rank.r2, Rank.r1, Rank.r1])
+        expected = Combination(7, [Rank.r3, Rank.r3, Rank.r3, Rank.r2, Rank.r2])
         self.assertEqual(expected.strength, result.strength)
         self.assertEqual(expected.kickers, result.kickers)
 
@@ -90,19 +90,19 @@ class CombinationFinderTests(unittest.TestCase):
         sh = Suit.hearths
         ss = Suit.spade
         # when 5 hearths flush then returns combo with kickers ordered by strength
-        test_input = [Card(Rank.r1, sh), Card(Rank.r2, sh), Card(Rank.r4, sh), Card(Rank.r5, sh), Card(Rank.r6, sh)]
+        test_input = [Card(Rank.King, sh), Card(Rank.r2, sh), Card(Rank.r4, sh), Card(Rank.r5, sh), Card(Rank.r6, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(6, result.strength)
-        self.assertEqual([Rank.r6, Rank.r5, Rank.r4, Rank.r2, Rank.r1], result.kickers)
+        self.assertEqual([Rank.King, Rank.r6, Rank.r5, Rank.r4, Rank.r2], result.kickers)
 
         # when 5 spades flush then returns combo with kickers ordered by strength
-        test_input = [Card(Rank.r5, ss), Card(Rank.r10, ss), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r6, ss)]
+        test_input = [Card(Rank.r5, ss), Card(Rank.r10, ss), Card(Rank.Ace, ss), Card(Rank.r2, ss), Card(Rank.r6, ss)]
         result = combination_finder.find(test_input)
         self.assertEqual(6, result.strength)
-        self.assertEqual([Rank.Ace, Rank.r10, Rank.r6, Rank.r5, Rank.r1], result.kickers)
+        self.assertEqual([Rank.Ace, Rank.r10, Rank.r6, Rank.r5, Rank.r2], result.kickers)
 
         # when more than 5 cards in flush returns only strongest 5
-        test_input = [Card(Rank.r5, sh), Card(Rank.r10, sh), Card(Rank.Ace, sh), Card(Rank.r1, sh), Card(Rank.r6, sh),
+        test_input = [Card(Rank.r5, sh), Card(Rank.r10, sh), Card(Rank.Ace, sh), Card(Rank.r2, sh), Card(Rank.r6, sh),
                       Card(Rank.Jack, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(6, result.strength)
@@ -112,11 +112,11 @@ class CombinationFinderTests(unittest.TestCase):
         sh = Suit.hearths
         ss = Suit.spade
         # when 5 hearths straight flush then returns combo with kickers ordered by strength
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh),
+        test_input = [Card(Rank.r6, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh),
                       Card(Rank.r3, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(9, result.strength)
-        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.r1], result.kickers)
+        self.assertEqual([Rank.r6, Rank.r5, Rank.r4, Rank.r3, Rank.r2], result.kickers)
         # when 5 spade straight flush then returns combo with kickers ordered by strength
         test_input = [Card(Rank.King, ss), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss),
                       Card(Rank.Jack, ss),
@@ -129,11 +129,11 @@ class CombinationFinderTests(unittest.TestCase):
         sh = Suit.hearths
         ss = Suit.spade
         # when straight then returns combo with kickers ordered by strength (1)
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh),
+        test_input = [Card(Rank.r6, sh), Card(Rank.Queen, ss), Card(Rank.r5, ss), Card(Rank.r5, sh),
                       Card(Rank.r2, ss), Card(Rank.r3, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(5, result.strength)
-        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.r1], result.kickers)
+        self.assertEqual([Rank.r6, Rank.r5, Rank.r4, Rank.r3, Rank.r2], result.kickers)
         # when two straights available then returns with stronger kicker (2)
         test_input = [Card(Rank.King, sh), Card(Rank.r9, ss), Card(Rank.r10, ss), Card(Rank.Queen, ss),
                       Card(Rank.Jack, ss),
@@ -141,18 +141,24 @@ class CombinationFinderTests(unittest.TestCase):
         result = combination_finder.find(test_input)
         self.assertEqual(5, result.strength)
         self.assertEqual([Rank.King, Rank.Queen, Rank.Jack, Rank.r10, Rank.r9], result.kickers)
+        # when straight from Ace to 5
+        test_input = [Card(Rank.r7, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r3, sh), Card(Rank.r4, sh)]
+        result = combination_finder.find(test_input)
+        self.assertEqual(5, result.strength)
+        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace], result.kickers)
 
     def test_find_three_of_a_kind(self):
         sh = Suit.hearths
         ss = Suit.spade
         # when three of a kind found then returns combo with kickers ordered by strength (1)
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r5, sh),
-                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r4, sh)]
+        test_input = [Card(Rank.Jack, sh), Card(Rank.Ace, ss), Card(Rank.Jack, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.Jack, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(4, result.strength)
-        self.assertEqual([Rank.r1, Rank.r1, Rank.r1, Rank.Ace, Rank.r5], result.kickers)
+        self.assertEqual([Rank.Jack, Rank.Jack, Rank.Jack, Rank.Ace, Rank.r5], result.kickers)
         # when three of a kind found then returns combo with kickers ordered by strength (2)
-        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r1, ss), Card(Rank.r5, sh),
+        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r3, ss), Card(Rank.r5, sh),
                       Card(Rank.r2, ss), Card(Rank.Ace, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(4, result.strength)
@@ -162,27 +168,27 @@ class CombinationFinderTests(unittest.TestCase):
         sh = Suit.hearths
         ss = Suit.spade
         # when two pairs found then returns combo with highest kicker
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
-                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r4, sh)]
+        test_input = [Card(Rank.Queen, sh), Card(Rank.Ace, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.Queen, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(3, result.strength)
-        self.assertEqual([Rank.r2, Rank.r2, Rank.r1, Rank.r1, Rank.Ace], result.kickers)
+        self.assertEqual([Rank.Queen, Rank.Queen, Rank.r2, Rank.r2, Rank.Ace], result.kickers)
         # when three pairs found then returns combo with highest pairs and highest kicker
-        test_input = [Card(Rank.r1, sh), Card(Rank.r3, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
-                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r3, sh)]
+        test_input = [Card(Rank.r10, sh), Card(Rank.r3, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
+                      Card(Rank.r2, ss), Card(Rank.r4, sh), Card(Rank.r3, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(3, result.strength)
-        self.assertEqual([Rank.r3, Rank.r3, Rank.r2, Rank.r2, Rank.r5], result.kickers)
+        self.assertEqual([Rank.r3, Rank.r3, Rank.r2, Rank.r2, Rank.r10], result.kickers)
 
     def test_find_pair(self):
         sh = Suit.hearths
         ss = Suit.spade
         # when pair found then returns combo with highest kickers (1)
-        test_input = [Card(Rank.r1, sh), Card(Rank.Ace, ss), Card(Rank.King, ss), Card(Rank.r4, sh),
-                      Card(Rank.r2, ss), Card(Rank.r1, sh), Card(Rank.r10, sh)]
+        test_input = [Card(Rank.r9, sh), Card(Rank.Ace, ss), Card(Rank.King, ss), Card(Rank.r4, sh),
+                      Card(Rank.r2, ss), Card(Rank.r9, sh), Card(Rank.r10, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(2, result.strength)
-        self.assertEqual([Rank.r1, Rank.r1, Rank.Ace, Rank.King, Rank.r10], result.kickers)
+        self.assertEqual([Rank.r9, Rank.r9, Rank.Ace, Rank.King, Rank.r10], result.kickers)
         # when pair found then returns combo with highest kickers (2)
         test_input = [Card(Rank.Jack, sh), Card(Rank.Ace, ss), Card(Rank.King, ss), Card(Rank.r4, sh),
                       Card(Rank.r2, ss), Card(Rank.r10, sh), Card(Rank.Jack, sh)]

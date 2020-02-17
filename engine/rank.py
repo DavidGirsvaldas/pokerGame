@@ -2,7 +2,6 @@ from enum import IntEnum
 
 
 class Rank(IntEnum):
-    r1 = 1
     r2 = 2
     r3 = 3
     r4 = 4

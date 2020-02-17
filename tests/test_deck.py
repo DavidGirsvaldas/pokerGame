@@ -5,7 +5,7 @@ from engine.deck import Deck
 
 
 class DeckTests(unittest.TestCase):
-    deck_size = 56
+    deck_size = 52
 
     def test_init_deck(self):
         deck = Deck()
