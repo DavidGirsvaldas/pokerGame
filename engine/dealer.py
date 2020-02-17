@@ -56,7 +56,7 @@ class Dealer:
             while True:
                 player_action, new_amount_to_call = current_player.act(chips_in_pot_per_player)
                 if player_action is Action.ACTION_FOLD:
-                    self.fold_player(current_player)
+                    self.player_folds(current_player)
                 if player_action is Action.ACTION_CALL:
                     amount_to_add = new_amount_to_call - current_player.money_in_pot
                     self.take_chips(current_player, amount_to_add)
@@ -80,11 +80,11 @@ class Dealer:
         self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]
         player = last_player_to_go
-        for i in range(3): # todo remvoe assumption is always 3 players
+        for i in range(len(self.pot.players)):
             player = self.seating.next_player_after_player(player)
             action, amount = player.act(0)
             if action == Action.ACTION_FOLD:
-                self.fold_player(player)
+                self.player_folds(player)
                 if self.is_winner_determined():
                     return self.award_winner()
             if action == Action.ACTION_RAISE:
@@ -95,11 +95,9 @@ class Dealer:
                     if next_player != player:
                         p_action, p_amount = next_player.act(amount)
                         if p_action == Action.ACTION_FOLD:
-                            self.fold_player(next_player)
+                            self.player_folds(next_player)
                         elif p_action == Action.ACTION_CALL:
-                            next_player.stack -= p_amount - next_player.money_in_pot
-                            self.pot.size += p_amount - next_player.money_in_pot
-                            next_player.money_in_pot += p_amount - next_player.money_in_pot
+                            self.player_calls(next_player, p_amount)
                         elif p_action == Action.ACTION_RAISE:
                             next_player.stack -= p_amount - next_player.money_in_pot
                             self.pot.size += p_amount - next_player.money_in_pot
@@ -108,15 +106,19 @@ class Dealer:
                                 if next_player2 != next_player:
                                     p_action2, p_amount2 = next_player2.act(p_amount)
                                     if p_action2 == Action.ACTION_FOLD:
-                                        self.fold_player(next_player2)
+                                        self.player_folds(next_player2)
                                     if p_action2 == Action.ACTION_CALL:
-                                        next_player2.stack -= p_amount - next_player2.money_in_pot
-                                        self.pot.size += p_amount - next_player2.money_in_pot
+                                        self.player_calls(next_player2, p_amount) # bug. when this player doesnt have enough to fully call
                             if self.is_winner_determined():
                                 return self.award_winner()
                             return
                         if self.is_winner_determined():
                             return self.award_winner()
+
+    def player_calls(self, player, amount):
+        player.stack -= amount - player.money_in_pot
+        self.pot.size += amount - player.money_in_pot
+        player.money_in_pot += amount - player.money_in_pot
 
     def is_winner_determined(self):
         return len(self.pot.players) == 1
@@ -126,6 +128,6 @@ class Dealer:
         winner.stack += self.pot.size
         return winner
 
-    def fold_player(self, player):
+    def player_folds(self, player):
         if player in self.pot.players:
             self.pot.players.remove(player)

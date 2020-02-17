@@ -379,35 +379,29 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(4, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(players) * 2 - 4, len(dealer.deck.cards))
 
-    def test_playing_flop__when_small_blind_is_10_and_player_bets__all_calls(self):
-        self.execute_test_of_player_betting_post_flop_and_all_calling(10)
+    def test_playing_flop__when_small_blind_is_10_and_player_bets__2players_calls(self):
+        self.execute_test_of_player_betting_post_flop_and_all_calling(10, 3)
 
-    def test_playing_flop__when_small_blind_is_15_and_player_bets__all_calls(self):
-        self.execute_test_of_player_betting_post_flop_and_all_calling(15)
+    def test_playing_flop__when_small_blind_is_15_and_player_bets__2players_calls(self):
+        self.execute_test_of_player_betting_post_flop_and_all_calling(15, 3)
 
-    def execute_test_of_player_betting_post_flop_and_all_calling(self, small_blind_size):
+    def test_playing_flop__when_small_blind_is_15_and_player_bets__4players_calls(self):
+        self.execute_test_of_player_betting_post_flop_and_all_calling(15, 5)
+
+    def execute_test_of_player_betting_post_flop_and_all_calling(self, small_blind_size, player_count):
         initial_stack = 100
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
-        players = [button_player, sb_player, bb_player]
+        players = [self.setup_new_player(initial_stack) for _ in range(player_count)]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
-        button_player.act = self.action_check_call
-        sb_player.act = self.action_raise(bet_size)
-        bb_player.act = self.action_check_call
+        players[player_count-1].act = self.action_raise(bet_size)
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
-        self.assertTrue(button_player in dealer.pot.players)
-        self.assertTrue(sb_player in dealer.pot.players)
-        self.assertTrue(bb_player in dealer.pot.players)
-        self.assertEqual(initial_stack - bet_size, button_player.stack)
-        self.assertEqual(initial_stack - bet_size, sb_player.stack)
-        self.assertEqual(initial_stack - bet_size, bb_player.stack)
-        self.assertEqual(bet_size * 3, dealer.pot.size)
+        self.assertTrue(all(p in dealer.pot.players for p in players))
+        self.assertTrue(all(p.stack == initial_stack - bet_size for p in players))
+        self.assertEqual(bet_size * player_count, dealer.pot.size)
         self.assertEqual(4, len(dealer.community_cards))
-        self.assertEqual(DeckTests.deck_size - len(players) * 2 - 4, len(dealer.deck.cards))
+        self.assertEqual(DeckTests.deck_size - player_count * 2 - 4, len(dealer.deck.cards))
 
     def test_playing_flop__when_player_bets_20__one_folds_another_calls(self):
         self.execute_test_of_player_betting_post_flop(20)
