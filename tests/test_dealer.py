@@ -481,13 +481,13 @@ class TestDealer(unittest.TestCase):
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_bet_fold(raise_size)
-        sb_player.act = self.action_raise_call(bet_size)
+        button_player.act = self.action_raise(raise_size)
+        sb_player.act = self.action_bet_fold(bet_size)
         bb_player.act = self.action_fold
         winner = dealer.play_flop()
-        self.assertEqual(sb_player, winner)
-        self.assertEqual(initial_stack - raise_size, button_player.stack)
-        self.assertEqual(initial_stack + raise_size + big_blind_size, sb_player.stack)
+        self.assertEqual(button_player, winner)
+        self.assertEqual(initial_stack - bet_size, sb_player.stack)
+        self.assertEqual(initial_stack + bet_size + big_blind_size, button_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
 
     def setup_dealer_and_play_preflop_where_everybody_calls(self, players, small_blind_size):

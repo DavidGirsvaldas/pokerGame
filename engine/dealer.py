@@ -82,7 +82,7 @@ class Dealer:
         player = last_player_to_go
         for i in range(3): # todo remvoe assumption is always 3 players
             player = self.seating.next_player_after_player(player)
-            action, amount = player.act(9999)
+            action, amount = player.act(0)
             if action == Action.ACTION_FOLD:
                 self.fold_player(player)
                 if self.is_winner_determined():
@@ -90,14 +90,31 @@ class Dealer:
             if action == Action.ACTION_RAISE:
                 player.stack -= amount - player.money_in_pot
                 self.pot.size += amount - player.money_in_pot
+                player.money_in_pot += amount - player.money_in_pot
                 for next_player in self.seating.players:
                     if next_player != player:
                         p_action, p_amount = next_player.act(amount)
                         if p_action == Action.ACTION_FOLD:
                             self.fold_player(next_player)
-                        else:
-                            next_player.stack -= amount - player.money_in_pot
-                            self.pot.size += amount - player.money_in_pot
+                        elif p_action == Action.ACTION_CALL:
+                            next_player.stack -= p_amount - next_player.money_in_pot
+                            self.pot.size += p_amount - next_player.money_in_pot
+                            next_player.money_in_pot += p_amount - next_player.money_in_pot
+                        elif p_action == Action.ACTION_RAISE:
+                            next_player.stack -= p_amount - next_player.money_in_pot
+                            self.pot.size += p_amount - next_player.money_in_pot
+                            next_player.money_in_pot += p_amount - next_player.money_in_pot
+                            for next_player2 in self.seating.players:
+                                if next_player2 != next_player:
+                                    p_action2, p_amount2 = next_player2.act(p_amount)
+                                    if p_action2 == Action.ACTION_FOLD:
+                                        self.fold_player(next_player2)
+                                    if p_action2 == Action.ACTION_CALL:
+                                        next_player2.stack -= p_amount - next_player2.money_in_pot
+                                        self.pot.size += p_amount - next_player2.money_in_pot
+                            if self.is_winner_determined():
+                                return self.award_winner()
+                            return
                         if self.is_winner_determined():
                             return self.award_winner()
 
