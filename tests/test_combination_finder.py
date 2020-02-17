@@ -158,11 +158,11 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual(4, result.strength)
         self.assertEqual([Rank.Jack, Rank.Jack, Rank.Jack, Rank.Ace, Rank.r5], result.kickers)
         # when three of a kind found then returns combo with kickers ordered by strength (2)
-        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r3, ss), Card(Rank.r5, sh),
+        test_input = [Card(Rank.Ace, sh), Card(Rank.Ace, ss), Card(Rank.r3, ss), Card(Rank.r6, sh),
                       Card(Rank.r2, ss), Card(Rank.Ace, sh), Card(Rank.r4, sh)]
         result = combination_finder.find(test_input)
         self.assertEqual(4, result.strength)
-        self.assertEqual([Rank.Ace, Rank.Ace, Rank.Ace, Rank.r5, Rank.r4], result.kickers)
+        self.assertEqual([Rank.Ace, Rank.Ace, Rank.Ace, Rank.r6, Rank.r4], result.kickers)
 
     def test_find_two_pairs(self):
         sh = Suit.hearths

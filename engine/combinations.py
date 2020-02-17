@@ -4,6 +4,8 @@ from engine.card import Card
 from engine.combination import Combination
 from collections import defaultdict
 
+from engine.rank import Rank
+
 
 def find_high_card(cards: Iterable[Card]):
     ranks = [card.rank for card in cards]
@@ -59,10 +61,13 @@ def find_three_of_a_kind(cards: List[Card]):
 
 def find_straight(cards: List[Card]):
     ranks = [card.rank for card in cards]
-    ranks_sorted = sorted(ranks, reverse=True)
+    unique_ranks = list(dict.fromkeys(ranks))
+    ranks_sorted = sorted(unique_ranks, reverse=True)
+    straight_starting_ace = [Rank.Ace, Rank.r5, Rank.r4, Rank.r3, Rank.r2]
+    if all(x in ranks_sorted for x in straight_starting_ace):
+        return Combination(5, [Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace])
     for i in range(len(ranks_sorted) - 4):
-        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (
-                ranks_sorted[i + 4] + 4):
+        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (ranks_sorted[i + 4] + 4):
             return Combination(5, ranks_sorted[i:i + 5])
 
 
