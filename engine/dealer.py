@@ -77,6 +77,20 @@ class Dealer:
         return round_of_calls_to_make(bb_player, True, amount_to_match)
 
     def play_flop(self):
+        def ask_players_for_actions(player_who_raised, new_raised_amount):
+            for next_player in self.seating.players:
+                if next_player != player_who_raised:
+                    p_action, p_amount = next_player.act(new_raised_amount)
+                    if p_action == Action.ACTION_FOLD:
+                        self.player_folds(next_player)
+                    elif p_action == Action.ACTION_CALL:
+                        self.player_calls(next_player, p_amount)
+                    elif p_action == Action.ACTION_RAISE:
+                        self.player_calls(next_player, p_amount)
+                        return ask_players_for_actions(next_player, p_amount)
+                    if self.is_winner_determined():
+                        return self.award_winner()
+
         self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
         player = self.seating.next_player_after_player(last_player_to_go)
@@ -84,45 +98,12 @@ class Dealer:
             action, amount = player.act(0)
             if action == Action.ACTION_FOLD:
                 self.player_folds(player)
-                if self.is_winner_determined():
-                    return self.award_winner()
+
             if action == Action.ACTION_RAISE:
                 self.player_calls(player, amount)
-
-                def ask_players_for_actions(player_who_raised, new_raised_amount):
-                    for next_player in self.seating.players:
-                        if next_player != player_who_raised:
-                            p_action, p_amount = next_player.act(new_raised_amount)
-                            if p_action == Action.ACTION_FOLD:
-                                self.player_folds(next_player)
-                            elif p_action == Action.ACTION_CALL:
-                                self.player_calls(next_player, p_amount)
-                            elif p_action == Action.ACTION_RAISE:
-                                self.player_calls(next_player, p_amount)
-                                for next_player2 in self.seating.players:
-                                    if next_player2 != next_player:
-                                        p_action2, p_amount2 = next_player2.act(p_amount)
-                                        if p_action2 == Action.ACTION_FOLD:
-                                            self.player_folds(next_player2)
-                                            if self.is_winner_determined():
-                                                return self.award_winner()
-                                        elif p_action2 == Action.ACTION_CALL:
-                                            self.player_calls(next_player2, p_amount)  # bug. when this player doesnt have enough to fully call. use p_amount2
-                                        elif p_action2 == Action.ACTION_RAISE:
-                                            self.player_calls(next_player2, p_amount2)
-                                            for next_player3 in self.seating.players:
-                                                if next_player3 != next_player2:
-                                                    p_action3, p_amount3 = next_player3.act(p_amount2)
-                                                    if p_action3 == Action.ACTION_FOLD:
-                                                        self.player_folds(next_player3)
-                                                        if self.is_winner_determined():
-                                                            return self.award_winner()
-                                                    elif p_action3 == Action.ACTION_CALL:
-                                                        self.player_calls(next_player3,p_amount3)
-                            if self.is_winner_determined():
-                                return self.award_winner()
-
                 return ask_players_for_actions(player, amount)
+            if self.is_winner_determined():
+                return self.award_winner()
             player = self.seating.next_player_after_player(player)
 
     def player_calls(self, player, amount):
@@ -139,5 +120,6 @@ class Dealer:
         return winner
 
     def player_folds(self, player):
+        player.money_in_pot = 0
         if player in self.pot.players:
             self.pot.players.remove(player)
