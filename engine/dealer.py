@@ -12,7 +12,7 @@ class Dealer:
         self.seating = seating
         self.pot = None
 
-    def deal(self):
+    def deal_cards_to_players(self):
         for player in self.seating.players:
             player.cards = self.deck.draw(2)
 
@@ -36,7 +36,7 @@ class Dealer:
         self.deck = Deck()
         self.deck.initialize()
         self.deck.shuffle()
-        self.deal()
+        self.deal_cards_to_players()
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
@@ -49,33 +49,10 @@ class Dealer:
             self.pot.players.append(player)
 
     def preflop_round(self, small_blind_size):
+        self.add_community_cards(3)  # todo should be revealed at the end, not start
         bb_player = self.seating.big_blind_player()
         amount_to_match = small_blind_size * 2
-
-        def round_of_calls_to_make(starting_player, include_starting_player, chips_in_pot_per_player):
-            current_player = self.seating.next_player_after_player(starting_player)
-            while True:
-                player_action, new_amount_to_call = current_player.act(chips_in_pot_per_player)
-                if player_action is Action.ACTION_FOLD:
-                    self.player_folds(current_player)
-                if player_action is Action.ACTION_CALL:
-                    amount_to_add = new_amount_to_call - current_player.money_in_pot
-                    self.take_chips(current_player, amount_to_add)
-                if player_action is Action.ACTION_RAISE:
-                    amount_to_add = new_amount_to_call - current_player.money_in_pot
-                    self.take_chips(current_player, amount_to_add)
-                    return round_of_calls_to_make(current_player, False, new_amount_to_call)
-                if self.is_winner_determined():
-                    return self.award_winner()
-                if current_player is starting_player:
-                    self.add_community_cards(3)
-                    return
-                current_player = self.seating.next_player_after_player(current_player)
-                if current_player is starting_player and not include_starting_player:
-                    self.add_community_cards(3)
-                    return
-
-        return round_of_calls_to_make(bb_player, True, amount_to_match)
+        return self.ask_players_for_actions(bb_player, amount_to_match, True)
 
     def play_river(self):
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
@@ -117,6 +94,8 @@ class Dealer:
 
     def player_calls(self, player, amount):
         player.stack -= amount - player.money_in_pot
+        if player not in self.pot.players:
+            self.pot.players.append(player)
         self.pot.size += amount - player.money_in_pot
         player.money_in_pot += amount - player.money_in_pot
 

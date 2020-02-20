@@ -74,7 +74,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         deck.initialize()
         dealer = Dealer(deck, seating)
-        dealer.deal()
+        dealer.deal_cards_to_players()
         hand_size = 2
         cards_dealt = len(seating.players) * hand_size
         self.assertEqual(cards_dealt, len(set(player1.cards + player2.cards)))
