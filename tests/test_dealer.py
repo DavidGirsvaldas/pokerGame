@@ -1,11 +1,14 @@
 import unittest
 
 from engine.action import Action
+from engine.card import Card
 from engine.deck import Deck
 from engine.player import Player
 from engine.dealer import Dealer
 from engine.pot import Pot
+from engine.rank import Rank
 from engine.seating import Seating
+from engine.suit import Suit
 from tests.test_deck import DeckTests
 
 
@@ -325,6 +328,7 @@ class TestDealer(unittest.TestCase):
                     return Action.ACTION_CALL, amount
                 print(player_name + " raises to " + str(raise_size))
                 return Action.ACTION_RAISE, raise_size
+
             return call_raise_action
 
         button_player.act = call_raise("Button")
@@ -336,6 +340,7 @@ class TestDealer(unittest.TestCase):
                     return Action.ACTION_RAISE, bet_size
                 print(player_name + " calls " + str(amount))
                 return Action.ACTION_CALL, amount
+
             return raise_call_action
 
         sb_player.act = raise_call("SmallBlind")
@@ -599,6 +604,24 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(None, winner)
         return dealer
 
+    def setup_dealer_and_play_turn_where_everybody_calls(self, players, small_blind_size):
+        for player in players:
+            player.act = self.action_check_call("Player")
+        seating = Seating(players)
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        winner = dealer.preflop_round(small_blind_size)
+        print("# Preflop concluded")
+        self.assertEqual(None, winner)
+        winner = dealer.play_flop()
+        print("# Flop concluded")
+        self.assertEqual(None, winner)
+        winner = dealer.play_turn()
+        print("# Turn concluded")
+        self.assertEqual(None, winner)
+        return dealer
+
     def test_playing_turn__when_all_fold__button_player_wins(self):
         initial_stack = 100
         small_blind_size = 5
@@ -661,3 +684,91 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(raise_size * 2 + bet_size * 2 + big_blind_size, dealer.pot.size)
         self.assertEqual(5, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(players) * 2 - 5, len(dealer.deck.cards))
+
+    def test_playing_river__when_all_fold__button_player_wins(self):
+        initial_stack = 100
+        small_blind_size = 5
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
+        button_player.act = self.action_fold("Button")
+        sb_player.act = self.action_fold("SmallBlind")
+        bb_player.act = self.action_fold("BigBlind")
+        winner = dealer.play_river()
+        self.assertEqual(button_player, winner)
+        self.assertEqual(initial_stack + small_blind_size * 4, button_player.stack)
+
+    def test_playing_river_when_player_raises_and_original_betting_player_folds(self):
+        initial_stack = 100
+        small_blind_size = 5
+        big_blind_size = small_blind_size * 2
+        bet_size = big_blind_size + 30
+        raise_size = bet_size + 20
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
+
+        button_player.act = self.action_raise(raise_size, "Button")
+        sb_player.act = self.action_bet_fold(bet_size, "SmallBlind")
+        bb_player.act = self.action_fold("BigBlind")
+        winner = dealer.play_river()
+        self.assertEqual(button_player, winner)
+        self.assertEqual(initial_stack - bet_size, sb_player.stack)
+        self.assertEqual(initial_stack + bet_size + big_blind_size, button_player.stack)
+        self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
+
+    def test_playing_river__when_all_checks__player_with_best_hand_wins1(self):
+        initial_stack = 100
+        small_blind_size = 5
+        big_blind = small_blind_size * 2
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
+        dealer.community_cards = [Card(Rank.r10, Suit.hearths),
+                                  Card(Rank.Jack, Suit.diamonds),
+                                  Card(Rank.Jack, Suit.diamonds),
+                                  Card(Rank.r2, Suit.spade),
+                                  Card(Rank.r5, Suit.clubs)]
+        button_player.cards = [Card(Rank.r4, Suit.hearths),
+                               Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kicker 10
+        sb_player.cards = [Card(Rank.Ace, Suit.hearths),
+                           Card(Rank.King, Suit.spade)]  # (Winner) has pair of Jacks with kickers Ace, King
+        bb_player.cards = [Card(Rank.Ace, Suit.spade),
+                           Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kickers Ace, 10
+        winner = dealer.play_river()
+        self.assertEqual(sb_player, winner)
+        self.assertEqual(initial_stack + big_blind * 2, sb_player.stack)
+        self.assertEqual(initial_stack - big_blind, button_player.stack)
+        self.assertEqual(initial_stack - big_blind, bb_player.stack)
+
+    def test_playing_river__when_all_checks__player_with_best_hand_wins2(self):
+        initial_stack = 100
+        small_blind_size = 5
+        big_blind = small_blind_size * 2
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
+        dealer.community_cards = [Card(Rank.r10, Suit.hearths),
+                                  Card(Rank.Jack, Suit.diamonds),
+                                  Card(Rank.Queen, Suit.diamonds),
+                                  Card(Rank.r2, Suit.spade),
+                                  Card(Rank.r5, Suit.clubs)]
+        button_player.cards = [Card(Rank.Ace, Suit.hearths),
+                               Card(Rank.King, Suit.clubs)]  # (winner) has straight
+        sb_player.cards = [Card(Rank.Jack, Suit.hearths),
+                           Card(Rank.Jack, Suit.clubs)]  # has three of a kind
+        bb_player.cards = [Card(Rank.Ace, Suit.spade),
+                           Card(Rank.r3, Suit.clubs)]  # has Ace high
+        winner = dealer.play_river()
+        self.assertEqual(button_player, winner)
+        self.assertEqual(initial_stack + big_blind * 2, button_player.stack)
+        self.assertEqual(initial_stack - big_blind, sb_player.stack)
+        self.assertEqual(initial_stack - big_blind, bb_player.stack)

@@ -1,3 +1,4 @@
+from engine import card_showdown
 from engine.action import Action
 from engine.deck import Deck
 from engine.pot import Pot
@@ -76,6 +77,16 @@ class Dealer:
 
         return round_of_calls_to_make(bb_player, True, amount_to_match)
 
+    def play_river(self):
+        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        winner = self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
+        if winner:
+            return winner
+        else:
+            # todo bug. can be more than one winner
+            winner = card_showdown.find_winner(self.seating.players, self.community_cards)[0] # todo bug. only players in pot should play
+            return self.award_player_as_winner(winner)
+
     def play_turn(self):
         self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
@@ -116,6 +127,10 @@ class Dealer:
         winner = self.pot.players[0]
         winner.stack += self.pot.size
         return winner
+
+    def award_player_as_winner(self, player):
+        player.stack += self.pot.size
+        return player
 
     def player_folds(self, player):
         player.money_in_pot = 0
