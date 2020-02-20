@@ -76,28 +76,33 @@ class Dealer:
 
         return round_of_calls_to_make(bb_player, True, amount_to_match)
 
-    def play_flop(self):
-        def ask_players_for_actions(player_who_raised, new_raised_amount, include_last_player):
-            next_player = self.seating.next_player_after_player(player_who_raised)
-            amount_of_calls_to_make = len(self.seating.players)
-            if not include_last_player:
-                amount_of_calls_to_make -= 1
-            for i in range(amount_of_calls_to_make):
-                p_action, p_amount = next_player.act(new_raised_amount)
-                if p_action == Action.ACTION_FOLD:
-                    self.player_folds(next_player)
-                elif p_action == Action.ACTION_CALL:
-                    self.player_calls(next_player, p_amount)
-                elif p_action == Action.ACTION_RAISE:
-                    self.player_calls(next_player, p_amount)
-                    return ask_players_for_actions(next_player, p_amount, False)
-                if self.is_winner_determined():
-                    return self.award_winner()
-                next_player = self.seating.next_player_after_player(next_player)
-
+    def play_turn(self):
         self.add_community_cards(1)  # todo should be revealed at the end, not start
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
+        return self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
+
+    def play_flop(self):
+        self.add_community_cards(1)  # todo should be revealed at the end, not start
+        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        return self.ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
+
+    def ask_players_for_actions(self, player_who_raised, new_raised_amount, include_last_player):
+        next_player = self.seating.next_player_after_player(player_who_raised)
+        amount_of_calls_to_make = len(self.seating.players)
+        if not include_last_player:
+            amount_of_calls_to_make -= 1
+        for i in range(amount_of_calls_to_make):
+            p_action, p_amount = next_player.act(new_raised_amount)
+            if p_action == Action.ACTION_FOLD:
+                self.player_folds(next_player)
+            elif p_action == Action.ACTION_CALL:
+                self.player_calls(next_player, p_amount)
+            elif p_action == Action.ACTION_RAISE:
+                self.player_calls(next_player, p_amount)
+                return self.ask_players_for_actions(next_player, p_amount, False)
+            if self.is_winner_determined():
+                return self.award_winner()
+            next_player = self.seating.next_player_after_player(next_player)
 
     def player_calls(self, player, amount):
         player.stack -= amount - player.money_in_pot
