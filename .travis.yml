@@ -1,0 +1,10 @@
+language: python
+python:
+  - 3.8.1
+install:
+  - pip install python-coveralls
+  - pip install coverage
+script:
+  - python -m unittest discover -s "./tests"
+after_success:
+  - coveralls
