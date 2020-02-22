@@ -20,11 +20,11 @@ class TestDealer(unittest.TestCase):
         return player
 
     def action_check_call(self, player_name):
-        def player_action_raise(amount):
+        def player_action_call(amount):
             print(player_name + " calls " + str(amount))
             return Action.ACTION_CALL, amount
 
-        return player_action_raise
+        return player_action_call
 
     def action_fold(self, player_name):
         def player_action_raise(_):
@@ -179,9 +179,6 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(small_blind_size * 3, dealer.pot.size)
         self.assertTrue(sb_player in dealer.pot.players)
         self.assertTrue(bb_player in dealer.pot.players)
-        self.assertEqual(2, len(button_player.cards))
-        self.assertEqual(2, len(sb_player.cards))
-        self.assertEqual(2, len(bb_player.cards))
 
     def test_preflop_round__when_all_fold(self):
         initial_stack = 100
@@ -196,7 +193,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(bb_player, winner)
         self.assertEqual(105, bb_player.stack)
 
@@ -213,7 +210,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(sb_player, winner)
         self.assertEqual(110, sb_player.stack)
 
@@ -230,11 +227,11 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(button_player, winner)
         self.assertEqual(115, button_player.stack)
 
-    def test_preflop_round__when_multiple_people_call(self):
+    def test_preflop_round__when_all_calls(self):
         initial_stack = 100
         small_blind_size = 5
         big_blind_size = small_blind_size * 2
@@ -242,23 +239,41 @@ class TestDealer(unittest.TestCase):
         sb_player = self.setup_new_player(initial_stack)
         bb_player = self.setup_new_player(initial_stack)
         button_player.act = self.action_check_call("Button")
-        sb_player.act = self.action_fold("SmallBlind")
+        sb_player.act = self.action_check_call("SmallBlind")
         bb_player.act = self.action_check_call("BigBlind")
         seating = Seating([button_player, sb_player, bb_player])
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
-        self.assertTrue(sb_player not in dealer.pot.players)
+        self.assertTrue(sb_player in dealer.pot.players)
         self.assertTrue(bb_player in dealer.pot.players)
         self.assertEqual(initial_stack - big_blind_size, button_player.stack)
-        self.assertEqual(initial_stack - small_blind_size, sb_player.stack)
+        self.assertEqual(initial_stack - big_blind_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(big_blind_size * 2 + small_blind_size, dealer.pot.size)
+        self.assertEqual(big_blind_size * 3, dealer.pot.size)
+
+    def test_preflop_round__when_all_calls__correct_state_of_cards_dealt(self):
+        initial_stack = 100
+        small_blind_size = 5
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        button_player.act = self.action_check_call("Button")
+        sb_player.act = self.action_check_call("SmallBlind")
+        bb_player.act = self.action_check_call("BigBlind")
+        seating = Seating([button_player, sb_player, bb_player])
+        deck = Deck()
+        dealer = Dealer(deck, seating)
+        dealer.setup_preflop(small_blind_size)
+        dealer.play_preflop(small_blind_size)
         self.assertEqual(3, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(seating.players) * 2 - 3, len(dealer.deck.cards))
+        self.assertEqual(2, len(button_player.cards))
+        self.assertEqual(2, len(sb_player.cards))
+        self.assertEqual(2, len(bb_player.cards))
 
     def test_preflop_round__when_player_bets__all_calls(self):
         initial_stack = 100
@@ -274,7 +289,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
         self.assertTrue(sb_player in dealer.pot.players)
@@ -300,7 +315,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
         self.assertTrue(sb_player in dealer.pot.players)
@@ -349,7 +364,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
         self.assertTrue(sb_player in dealer.pot.players)
@@ -584,7 +599,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         print("# Preflop concluded")
         self.assertEqual(None, winner)
         return dealer
@@ -596,7 +611,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         print("# Preflop concluded")
         self.assertEqual(None, winner)
         winner = dealer.play_flop()
@@ -611,7 +626,7 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.setup_preflop(small_blind_size)
-        winner = dealer.preflop_round(small_blind_size)
+        winner = dealer.play_preflop(small_blind_size)
         print("# Preflop concluded")
         self.assertEqual(None, winner)
         winner = dealer.play_flop()

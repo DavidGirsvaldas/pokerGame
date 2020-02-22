@@ -36,7 +36,6 @@ class Dealer:
         self.deck = Deck()
         self.deck.initialize()
         self.deck.shuffle()
-        self.deal_cards_to_players()
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
@@ -48,11 +47,22 @@ class Dealer:
         if player not in self.pot.players:
             self.pot.players.append(player)
 
-    def preflop_round(self, small_blind_size):
+    def play_preflop(self, small_blind_size):
+        self.deal_cards_to_players()
         self.add_community_cards(3)  # todo should be revealed at the end, not start
         bb_player = self.seating.big_blind_player()
         amount_to_match = small_blind_size * 2
         return self.ask_players_for_actions(bb_player, amount_to_match, True)
+
+    def play_flop(self):
+        self.add_community_cards(1)  # todo should be revealed at the end, not start
+        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        return self.ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
+
+    def play_turn(self):
+        self.add_community_cards(1)  # todo should be revealed at the end, not start
+        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        return self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
 
     def play_river(self):
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
@@ -63,16 +73,6 @@ class Dealer:
             # todo bug. can be more than one winner
             winner = card_showdown.find_winner(self.seating.players, self.community_cards)[0] # todo bug. only players in pot should play
             return self.award_player_as_winner(winner)
-
-    def play_turn(self):
-        self.add_community_cards(1)  # todo should be revealed at the end, not start
-        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
-
-    def play_flop(self):
-        self.add_community_cards(1)  # todo should be revealed at the end, not start
-        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
 
     def ask_players_for_actions(self, player_who_raised, new_raised_amount, include_last_player):
         next_player = self.seating.next_player_after_player(player_who_raised)
