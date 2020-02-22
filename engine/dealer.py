@@ -30,12 +30,10 @@ class Dealer:
         available_size_of_big_blind = min(small_blind_size * 2, bb_player.stack)
         self.take_chips(bb_player, available_size_of_big_blind)
 
-    def setup_preflop(self, small_blind_size):
-        self.pot = Pot()
-        self.collect_blinds(small_blind_size)
+    def setup_deck(self):
         self.deck = Deck()
         self.deck.initialize()
-        self.deck.shuffle()
+        # todo bug. needs shuffling
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
@@ -48,6 +46,8 @@ class Dealer:
             self.pot.players.append(player)
 
     def play_preflop(self, small_blind_size):
+        self.pot = Pot()
+        self.collect_blinds(small_blind_size)
         self.deal_cards_to_players()
         self.add_community_cards(3)  # todo should be revealed at the end, not start
         bb_player = self.seating.big_blind_player()
