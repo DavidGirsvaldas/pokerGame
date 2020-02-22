@@ -49,22 +49,22 @@ class Dealer:
         self.pot = Pot()
         self.collect_blinds(small_blind_size)
         self.deal_cards_to_players()
-        self.add_community_cards(3)  # todo should be revealed at the end, not start
         bb_player = self.seating.big_blind_player()
         amount_to_match = small_blind_size * 2
         return self.ask_players_for_actions(bb_player, amount_to_match, True)
 
     def play_flop(self):
-        self.add_community_cards(1)  # todo should be revealed at the end, not start
+        self.add_community_cards(3)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
         return self.ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
 
     def play_turn(self):
-        self.add_community_cards(1)  # todo should be revealed at the end, not start
+        self.add_community_cards(1)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
         return self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
 
     def play_river(self):
+        # todo bug. community card not added
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
         winner = self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
         if winner:
