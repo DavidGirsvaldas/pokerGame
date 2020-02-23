@@ -15,3 +15,14 @@ class Rank(IntEnum):
     Queen = 12
     King = 13
     Ace = 14
+
+    def __str__(self):
+        switcher = {
+            11: "Jack",
+            12: "Queen",
+            13: "King",
+            14: "Ace"
+        }
+        if self.value in switcher:
+            return switcher[self.value]
+        return str(self.value)

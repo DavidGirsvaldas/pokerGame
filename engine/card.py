@@ -13,3 +13,6 @@ class Card:
 
     def __hash__(self):
         return hash((self.rank, self.suit))
+
+    def __str__(self):
+        return str(self.rank) + " of " + str(self.suit)

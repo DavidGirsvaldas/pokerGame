@@ -1,11 +1,11 @@
 class Player:
 
-    def __init__(self):
+    def __init__(self, initial_stack = 0):
         self.cards = []
-        self.stack = 0
+        self.stack = initial_stack
         self.money_in_pot = 0
-        def raise_(ex):
-            raise ex
-        self.act = lambda x: raise_(NotImplemented())
+
+    def receive_cards(self, cards):
+        self.cards = cards
 
 

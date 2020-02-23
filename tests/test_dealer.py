@@ -14,9 +14,8 @@ from tests.test_deck import DeckTests
 
 class TestDealer(unittest.TestCase):
 
-    def setup_new_player(self, initial_stack):
-        player = Player()
-        player.stack = initial_stack
+    def setup_new_player(self, initial_stack = 1000):
+        player = Player(initial_stack)
         return player
 
     def action_check_call(self, player_name):
@@ -127,8 +126,8 @@ class TestDealer(unittest.TestCase):
         self.assertTrue(player3 in dealer.pot.players)
 
     def test_move_button__when2players(self):
-        initial_button_player = Player()
-        initial_bb_player = Player()
+        initial_button_player = self.setup_new_player()
+        initial_bb_player = self.setup_new_player()
         seating = Seating([initial_button_player, initial_bb_player])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -140,11 +139,11 @@ class TestDealer(unittest.TestCase):
         seating.button_pos = 0
 
     def test_move_button__when5players(self):
-        player1 = Player()
-        player2 = Player()
-        initial_button_player = Player()
-        initial_sb_player = Player()
-        initial_bb_player = Player()
+        player1 = self.setup_new_player()
+        player2 = self.setup_new_player()
+        initial_button_player = self.setup_new_player()
+        initial_sb_player = self.setup_new_player()
+        initial_bb_player = self.setup_new_player()
         seating = Seating([player1, player2, initial_button_player, initial_sb_player, initial_bb_player])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -725,13 +724,13 @@ class TestDealer(unittest.TestCase):
         dealer.community_cards = [Card(Rank.r10, Suit.hearths),
                                   Card(Rank.Jack, Suit.diamonds),
                                   Card(Rank.Jack, Suit.diamonds),
-                                  Card(Rank.r2, Suit.spade),
+                                  Card(Rank.r2, Suit.spades),
                                   Card(Rank.r5, Suit.clubs)]
         button_player.cards = [Card(Rank.r4, Suit.hearths),
                                Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kicker 10
         sb_player.cards = [Card(Rank.Ace, Suit.hearths),
-                           Card(Rank.King, Suit.spade)]  # (Winner) has pair of Jacks with kickers Ace, King
-        bb_player.cards = [Card(Rank.Ace, Suit.spade),
+                           Card(Rank.King, Suit.spades)]  # (Winner) has pair of Jacks with kickers Ace, King
+        bb_player.cards = [Card(Rank.Ace, Suit.spades),
                            Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kickers Ace, 10
         winner = dealer.play_river()
         self.assertEqual(sb_player, winner)
@@ -751,13 +750,13 @@ class TestDealer(unittest.TestCase):
         dealer.community_cards = [Card(Rank.r10, Suit.hearths),
                                   Card(Rank.Jack, Suit.diamonds),
                                   Card(Rank.Queen, Suit.diamonds),
-                                  Card(Rank.r2, Suit.spade),
+                                  Card(Rank.r2, Suit.spades),
                                   Card(Rank.r5, Suit.clubs)]
         button_player.cards = [Card(Rank.Ace, Suit.hearths),
                                Card(Rank.King, Suit.clubs)]  # (winner) has straight
         sb_player.cards = [Card(Rank.Jack, Suit.hearths),
                            Card(Rank.Jack, Suit.clubs)]  # has three of a kind
-        bb_player.cards = [Card(Rank.Ace, Suit.spade),
+        bb_player.cards = [Card(Rank.Ace, Suit.spades),
                            Card(Rank.r3, Suit.clubs)]  # has Ace high
         winner = dealer.play_river()
         self.assertEqual(button_player, winner)

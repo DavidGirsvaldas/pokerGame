@@ -14,7 +14,7 @@ class Dealer:
 
     def deal_cards_to_players(self):
         for player in self.seating.players:
-            player.cards = self.deck.draw(2)
+            player.receive_cards(self.deck.draw(2))
 
     def move_button(self):
         if self.seating.button_pos == len(self.seating.players) - 1:
@@ -33,10 +33,11 @@ class Dealer:
     def setup_deck(self):
         self.deck = Deck()
         self.deck.initialize()
-        # todo bug. needs shuffling
+        self.deck.shuffle()  # todo not tested
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
+        print("Community cards: " + "".join([" "+str(card) for card in self.community_cards]))
 
     def take_chips(self, player, amount):
         player.stack -= amount
@@ -56,22 +57,26 @@ class Dealer:
     def play_flop(self):
         self.add_community_cards(3)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10, True) # todo remove assumption that big blind size is always 10
+        return self.ask_players_for_actions(last_player_to_go, 10,
+                                            True)  # todo remove assumption that big blind size is always 10
 
     def play_turn(self):
         self.add_community_cards(1)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
+        return self.ask_players_for_actions(last_player_to_go, 10,
+                                            True)  # todo remove assumption that big blind size is always 10
 
     def play_river(self):
         # todo bug. community card not added
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        winner = self.ask_players_for_actions(last_player_to_go, 10, True)  # todo remove assumption that big blind size is always 10
+        winner = self.ask_players_for_actions(last_player_to_go, 10,
+                                              True)  # todo remove assumption that big blind size is always 10
         if winner:
             return winner
         else:
             # todo bug. can be more than one winner
-            winner = card_showdown.find_winner(self.seating.players, self.community_cards)[0] # todo bug. only players in pot should play
+            winner = card_showdown.find_winner(self.seating.players, self.community_cards)[
+                0]  # todo bug. only players in pot should play
             return self.award_player_as_winner(winner)
 
     def ask_players_for_actions(self, player_who_raised, new_raised_amount, include_last_player):
