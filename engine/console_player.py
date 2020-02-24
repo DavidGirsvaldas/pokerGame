@@ -13,5 +13,5 @@ class ConsolePlayer(Player):
         return Action.ACTION_CALL, required_amount_in_pot
 
     def receive_cards(self, cards):
-        print("Cards received: "+"".join([" "+str(card) for card in cards]))
+        print("Cards received: "+", ".join([str(card) for card in cards]))
         super(ConsolePlayer, self).receive_cards(cards)
