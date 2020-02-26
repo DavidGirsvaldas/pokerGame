@@ -6,11 +6,12 @@ from engine.pot import Pot
 
 class Dealer:
 
-    def __init__(self, deck, seating):
+    def __init__(self, deck, seating, random_seed_for_shuffling = None):
         self.community_cards = []
         self.deck = deck
         self.seating = seating
         self.pot = None
+        self.random_seed_for_shuffling = random_seed_for_shuffling
 
     def deal_cards_to_players(self):
         for player in self.seating.players:
@@ -33,7 +34,7 @@ class Dealer:
     def setup_deck(self):
         self.deck = Deck()
         self.deck.initialize()
-        self.deck.shuffle()  # todo not tested
+        self.deck.shuffle(self.random_seed_for_shuffling)
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
@@ -65,7 +66,7 @@ class Dealer:
         return self.ask_players_for_actions(last_player_to_go, 10,True)  # todo remove assumption that big blind size is always 10
 
     def play_river(self):
-        # todo bug. community card not added
+        self.add_community_cards(1)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
         winner = self.ask_players_for_actions(last_player_to_go, 10,True)  # todo remove assumption that big blind size is always 10
         if winner:

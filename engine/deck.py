@@ -14,8 +14,11 @@ class Deck:
             for rank in Rank:
                 self.cards.append(Card(rank, suit))
 
-    def shuffle(self):
-        random.shuffle(self.cards)
+    def shuffle(self, random_seed = None):
+        if random_seed:
+            random.Random(random_seed).shuffle(self.cards)
+        else:
+            random.shuffle(self.cards)
 
     def draw(self, count):
-        return [self.cards.pop(i) for i in range(count)]
+        return [self.cards.pop() for _ in range(count)]

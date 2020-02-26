@@ -9,6 +9,13 @@ from engine.suit import Suit
 
 class CardShowdownTests(unittest.TestCase):
 
+    def test_find_winner__when_cards_missing__throws_exception(self):
+        only_4_common_cards = [Card(Rank.r10, Suit.hearths), Card(Rank.Jack, Suit.diamonds),
+                               Card(Rank.Queen, Suit.diamonds), Card(Rank.r2, Suit.spades)]
+        player1 = self.init_test_player([Card(Rank.r2, Suit.hearths), Card(Rank.r3, Suit.clubs)])
+        player2 = self.init_test_player([Card(Rank.r3, Suit.hearths), Card(Rank.r2, Suit.clubs)])
+        self.assertRaises(ValueError, card_showdown.find_winner, [player1, player2], only_4_common_cards)
+
     def test_find_winner__when2players__returns_winner(self):
         common_cards = [Card(Rank.r10, Suit.hearths), Card(Rank.Jack, Suit.diamonds), Card(Rank.Queen, Suit.diamonds),
                         Card(Rank.r2, Suit.spades), Card(Rank.r5, Suit.clubs)]

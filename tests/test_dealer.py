@@ -1,20 +1,17 @@
 import unittest
 
 from engine.action import Action
-from engine.card import Card
+from engine.dealer import Dealer
 from engine.deck import Deck
 from engine.player import Player
-from engine.dealer import Dealer
 from engine.pot import Pot
-from engine.rank import Rank
 from engine.seating import Seating
-from engine.suit import Suit
 from tests.test_deck import DeckTests
 
 
 class TestDealer(unittest.TestCase):
 
-    def setup_new_player(self, initial_stack = 1000):
+    def setup_new_player(self, initial_stack=1000):
         player = Player(initial_stack)
         return player
 
@@ -588,11 +585,11 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(None, winner)
         return dealer
 
-    def setup_dealer_and_play_turn_where_everybody_calls(self, players, small_blind_size):
+    def setup_dealer_and_play_turn_where_everybody_calls(self, players, small_blind_size, random_seed_for_shuffling = None):
         for player in players:
             player.act = self.action_check_call("Player")
         seating = Seating(players)
-        dealer = Dealer(None, seating)
+        dealer = Dealer(None, seating, random_seed_for_shuffling)
         dealer.setup_deck()
         winner = dealer.play_preflop(small_blind_size)
         print("# Preflop concluded")
@@ -720,18 +717,9 @@ class TestDealer(unittest.TestCase):
         sb_player = self.setup_new_player(initial_stack)
         bb_player = self.setup_new_player(initial_stack)
         players = [button_player, sb_player, bb_player]
-        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
-        dealer.community_cards = [Card(Rank.r10, Suit.hearths),
-                                  Card(Rank.Jack, Suit.diamonds),
-                                  Card(Rank.Jack, Suit.diamonds),
-                                  Card(Rank.r2, Suit.spades),
-                                  Card(Rank.r5, Suit.clubs)]
-        button_player.cards = [Card(Rank.r4, Suit.hearths),
-                               Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kicker 10
-        sb_player.cards = [Card(Rank.Ace, Suit.hearths),
-                           Card(Rank.King, Suit.spades)]  # (Winner) has pair of Jacks with kickers Ace, King
-        bb_player.cards = [Card(Rank.Ace, Suit.spades),
-                           Card(Rank.r3, Suit.clubs)]  # has pair of Jacks with kickers Ace, 10
+        random_seed_for_shuffling = 4
+        # seed value 4 results in shuffling where Button has a high card, SmallBlind with Flush, BigBlind with a Pair.
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size, random_seed_for_shuffling)
         winner = dealer.play_river()
         self.assertEqual(sb_player, winner)
         self.assertEqual(initial_stack + big_blind * 2, sb_player.stack)
@@ -746,20 +734,11 @@ class TestDealer(unittest.TestCase):
         sb_player = self.setup_new_player(initial_stack)
         bb_player = self.setup_new_player(initial_stack)
         players = [button_player, sb_player, bb_player]
-        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
-        dealer.community_cards = [Card(Rank.r10, Suit.hearths),
-                                  Card(Rank.Jack, Suit.diamonds),
-                                  Card(Rank.Queen, Suit.diamonds),
-                                  Card(Rank.r2, Suit.spades),
-                                  Card(Rank.r5, Suit.clubs)]
-        button_player.cards = [Card(Rank.Ace, Suit.hearths),
-                               Card(Rank.King, Suit.clubs)]  # (winner) has straight
-        sb_player.cards = [Card(Rank.Jack, Suit.hearths),
-                           Card(Rank.Jack, Suit.clubs)]  # has three of a kind
-        bb_player.cards = [Card(Rank.Ace, Suit.spades),
-                           Card(Rank.r3, Suit.clubs)]  # has Ace high
+        random_seed_for_shuffling = 2
+        # seed value 2 results in shuffling where Button has a Pair, SmallBlind with High Card, BigBlind with a Pair, but BigBlind has a better 2nd kicker
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size, random_seed_for_shuffling)
         winner = dealer.play_river()
-        self.assertEqual(button_player, winner)
-        self.assertEqual(initial_stack + big_blind * 2, button_player.stack)
+        self.assertEqual(bb_player, winner)
+        self.assertEqual(initial_stack + big_blind * 2, bb_player.stack)
         self.assertEqual(initial_stack - big_blind, sb_player.stack)
-        self.assertEqual(initial_stack - big_blind, bb_player.stack)
+        self.assertEqual(initial_stack - big_blind, button_player.stack)
