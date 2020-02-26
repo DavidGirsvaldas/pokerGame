@@ -16,8 +16,10 @@ class Combination:
     def __lt__(self, other):
         if self.strength == other.strength:
             for i in range(0, 5):
-                if other.kickers[i] > self.kickers[i]:
-                    return True
+                if other.kickers[i] == self.kickers[i]:
+                    continue
+                else:
+                    return other.kickers[i] > self.kickers[i]
         return self.strength < other.strength
 
     def __str__(self):
