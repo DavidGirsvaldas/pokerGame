@@ -73,7 +73,7 @@ class Dealer:
             return winner
         else:
             # todo bug. can be more than one winner
-            winner = card_showdown.find_winner(self.seating.players, self.community_cards)[0]  # todo bug. only players in pot should play
+            winner = card_showdown.find_winner(self.pot.players, self.community_cards)[0]
             return self.award_player_as_winner(winner)
 
     def ask_players_for_actions(self, player_who_raised, new_raised_amount, include_last_player):

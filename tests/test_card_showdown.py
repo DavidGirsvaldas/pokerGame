@@ -28,8 +28,8 @@ class CardShowdownTests(unittest.TestCase):
     def test_find_winner__when_player_has_higher_pair(self):
         common_cards = [Card(Rank.r3, Suit.spades), Card(Rank.King, Suit.clubs), Card(Rank.r10, Suit.diamonds),
                         Card(Rank.r5, Suit.spades), Card(Rank.r8, Suit.clubs)]
-        player1 = self.init_test_player([Card(Rank.r6, Suit.diamonds), Card(Rank.r6, Suit.spades)])  # has straight
-        player2 = self.init_test_player([Card(Rank.r3, Suit.hearths), Card(Rank.Jack, Suit.clubs)])  # has three of a kind
+        player1 = self.init_test_player([Card(Rank.r6, Suit.diamonds), Card(Rank.r6, Suit.spades)])  # has pair of 6s
+        player2 = self.init_test_player([Card(Rank.r3, Suit.hearths), Card(Rank.Jack, Suit.clubs)])  # has pair of 3s
         result = card_showdown.find_winner([player1, player2], common_cards)
         self.assertEqual(1, len(result))
         self.assertIn(player1, result)

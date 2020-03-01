@@ -719,7 +719,8 @@ class TestDealer(unittest.TestCase):
         players = [button_player, sb_player, bb_player]
         random_seed_for_shuffling = 4
         # seed value 4 results in shuffling where Button has a high card, SmallBlind with Flush, BigBlind with a Pair.
-        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size, random_seed_for_shuffling)
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size,
+                                                                       random_seed_for_shuffling)
         winner = dealer.play_river()
         self.assertEqual(sb_player, winner)
         self.assertEqual(initial_stack + big_blind * 2, sb_player.stack)
@@ -736,9 +737,29 @@ class TestDealer(unittest.TestCase):
         players = [button_player, sb_player, bb_player]
         random_seed_for_shuffling = 2
         # seed value 2 results in shuffling where Button has a Pair, SmallBlind with High Card, BigBlind with a Pair, but BigBlind has a better 2nd kicker
-        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size, random_seed_for_shuffling)
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size,
+                                                                       random_seed_for_shuffling)
         winner = dealer.play_river()
         self.assertEqual(bb_player, winner)
         self.assertEqual(initial_stack + big_blind * 2, bb_player.stack)
         self.assertEqual(initial_stack - big_blind, sb_player.stack)
         self.assertEqual(initial_stack - big_blind, button_player.stack)
+
+    def test_playing_river__when_only_players_in_pot_participate_in_showdown(self):
+        initial_stack = 100
+        small_blind_size = 5
+        big_blind = small_blind_size * 2
+        button_player = self.setup_new_player(initial_stack)
+        sb_player = self.setup_new_player(initial_stack)
+        bb_player = self.setup_new_player(initial_stack)
+        players = [button_player, sb_player, bb_player]
+        random_seed_for_shuffling = 2
+        # seed value 2 results in shuffling where Button has a Pair, SmallBlind with High Card, BigBlind with a Pair, but BigBlind has a better 2nd kicker
+        dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size,
+                                                                       random_seed_for_shuffling)
+        bb_player.act = self.action_fold("BigBlind")
+        winner = dealer.play_river()
+        self.assertEqual(button_player, winner)
+        self.assertEqual(initial_stack + big_blind * 2, button_player.stack)
+        self.assertEqual(initial_stack - big_blind, sb_player.stack)
+        self.assertEqual(initial_stack - big_blind, bb_player.stack)
