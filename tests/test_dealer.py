@@ -16,13 +16,25 @@ class TestDealer(unittest.TestCase):
         return player
 
     @staticmethod
+    def action_call_fold(call_amount):
+        def player_call_fold(amount):
+            player_call_fold.times_called += 1
+            if player_call_fold.times_called > call_amount:
+                return Action.ACTION_FOLD, 0
+            return Action.ACTION_CALL, amount
+
+        player_call_fold.times_called = 0
+        return player_call_fold
+
+    @staticmethod
     def action_check_call():
         def player_action_call(amount):
             return Action.ACTION_CALL, amount
 
         return player_action_call
 
-    def action_fold(self):
+    @staticmethod
+    def action_fold():
 
         def player_action_raise(_):
             player_action_raise.times_called += 1

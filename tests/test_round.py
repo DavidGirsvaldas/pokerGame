@@ -38,3 +38,51 @@ class TestRound(unittest.TestCase):
         winner = round.play_round()
         self.assertEqual("SmallBlind", winner.name)
         self.assertEqual(1150, winner.stack)
+
+    def test_play_round__when_player_wins_in_preflop__round_concludes(self):
+        initial_stack = 1000
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        utg_player = self.setup_new_player("UTG", initial_stack)
+        button_player.act = TestDealer.action_fold()
+        sb_player.act = TestDealer.action_fold()
+        bb_player.act = TestDealer.action_fold()
+        utg_player.act = TestDealer.action_fold()
+        seating = Seating([button_player, sb_player, bb_player, utg_player])
+        dealer = Dealer(None, seating)
+        round = Round(dealer)
+        winner = round.play_round()
+        self.assertEqual("BigBlind", winner.name)
+
+    def test_play_round__when_player_wins_in_flop__round_concludes(self):
+        initial_stack = 1000
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        utg_player = self.setup_new_player("UTG", initial_stack)
+        button_player.act = TestDealer.action_call_fold(1)
+        sb_player.act = TestDealer.action_call_fold(1)
+        bb_player.act = TestDealer.action_call_fold(1)
+        utg_player.act = TestDealer.action_call_fold(1)
+        seating = Seating([button_player, sb_player, bb_player, utg_player])
+        dealer = Dealer(None, seating)
+        round = Round(dealer)
+        winner = round.play_round()
+        self.assertEqual("Button", winner.name)
+
+    def test_play_round__when_player_wins_in_turn__round_concludes(self):
+        initial_stack = 1000
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        utg_player = self.setup_new_player("UTG", initial_stack)
+        button_player.act = TestDealer.action_call_fold(2)
+        sb_player.act = TestDealer.action_call_fold(2)
+        bb_player.act = TestDealer.action_call_fold(2)
+        utg_player.act = TestDealer.action_call_fold(2)
+        seating = Seating([button_player, sb_player, bb_player, utg_player])
+        dealer = Dealer(None, seating)
+        round = Round(dealer)
+        winner = round.play_round()
+        self.assertEqual("Button", winner.name)
