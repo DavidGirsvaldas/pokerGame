@@ -19,10 +19,7 @@ class Dealer:
             player.receive_cards(self.deck.draw(2))
 
     def move_button(self):
-        if self.seating.button_pos == len(self.seating.players) - 1:
-            self.seating.button_pos = 0
-            return
-        self.seating.button_pos += 1
+        self.seating.move_button()
 
     def collect_blinds(self, small_blind_size):
         sb_player = self.seating.small_blind_player()
@@ -59,17 +56,17 @@ class Dealer:
 
     def play_flop(self):
         self.add_community_cards(3)
-        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        last_player_to_go = self.seating.button_player()
         return self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
 
     def play_turn(self):
         self.add_community_cards(1)
-        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        last_player_to_go = self.seating.button_player()
         return self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
 
     def play_river(self):
         self.add_community_cards(1)
-        last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
+        last_player_to_go = self.seating.button_player()
         winner = self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
         if winner:
             return winner
