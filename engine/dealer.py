@@ -84,19 +84,20 @@ class Dealer:
         if not include_last_player:
             amount_of_calls_to_make -= 1
         for i in range(amount_of_calls_to_make):
-            p_action, p_amount = next_player.act(new_raised_amount)
-            if p_action == Action.ACTION_FOLD:
-                print(str(next_player) + " folds")
-                self.player_folds(next_player)
-            elif p_action == Action.ACTION_CALL:
-                print(str(next_player) + " calls " + str(p_amount))
-                self.player_calls(next_player, p_amount)
-            elif p_action == Action.ACTION_RAISE:
-                print(str(next_player) + " raises to " + str(p_amount))
-                self.player_calls(next_player, p_amount)
-                return self.ask_players_for_actions(next_player, p_amount, False)
-            if self.is_winner_determined():
-                return self.award_winner()
+            if next_player.cards:
+                p_action, p_amount = next_player.act(new_raised_amount)
+                if p_action == Action.ACTION_FOLD:
+                    print(str(next_player) + " folds")
+                    self.player_folds(next_player)
+                elif p_action == Action.ACTION_CALL:
+                    print(str(next_player) + " calls " + str(p_amount))
+                    self.player_calls(next_player, p_amount)
+                elif p_action == Action.ACTION_RAISE:
+                    print(str(next_player) + " raises to " + str(p_amount))
+                    self.player_calls(next_player, p_amount)
+                    return self.ask_players_for_actions(next_player, p_amount, False)
+                if self.is_winner_determined():
+                    return self.award_winner()
             next_player = self.seating.next_player_after_player(next_player)
 
     def player_calls(self, player, amount):
@@ -120,5 +121,6 @@ class Dealer:
 
     def player_folds(self, player):
         player.money_in_pot = 0
+        player.cards = None
         if player in self.pot.players:
             self.pot.players.remove(player)

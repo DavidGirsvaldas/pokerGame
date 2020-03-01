@@ -23,9 +23,14 @@ class TestDealer(unittest.TestCase):
         return player_action_call
 
     def action_fold(self):
+
         def player_action_raise(_):
+            player_action_raise.times_called += 1
+            if player_action_raise.times_called > 1:
+                raise Exception("Player not expected to be asked for actions after folding")
             return Action.ACTION_FOLD, 0
 
+        player_action_raise.times_called = 0
         return player_action_raise
 
     def action_raise(self, new_required_total_player_contribution_to_pot):

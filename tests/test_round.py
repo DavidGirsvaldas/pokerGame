@@ -20,7 +20,7 @@ class TestRound(unittest.TestCase):
 
         return player_action_raise
 
-    def test_play_round__when_played_with_fixed_deck_and_player_keeps_raising__expected_players_wins(self):
+    def test_play_round__when_played_with_fixed_deck_and_player_keeps_raising__expected_player_wins(self):
         initial_stack = 1000
         button_player = self.setup_new_player("Button", initial_stack)
         sb_player = self.setup_new_player("SmallBlind", initial_stack)
