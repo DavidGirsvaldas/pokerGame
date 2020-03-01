@@ -57,6 +57,6 @@ class CardShowdownTests(unittest.TestCase):
         self.assertIn(player3, result)
 
     def init_test_player(self, cards):
-        player = Player()
+        player = Player("Player")
         player.cards = cards
         return player

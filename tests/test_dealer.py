@@ -11,61 +11,53 @@ from tests.test_deck import DeckTests
 
 class TestDealer(unittest.TestCase):
 
-    def setup_new_player(self, initial_stack=1000):
-        player = Player(initial_stack)
+    def setup_new_player(self, name, initial_stack):
+        player = Player(name, initial_stack)
         return player
 
-    def action_check_call(self, player_name):
+    def action_check_call(self):
         def player_action_call(amount):
-            print(player_name + " calls " + str(amount))
             return Action.ACTION_CALL, amount
 
         return player_action_call
 
-    def action_fold(self, player_name):
+    def action_fold(self):
         def player_action_raise(_):
-            print(player_name + " folds")
             return Action.ACTION_FOLD, 0
 
         return player_action_raise
 
-    def action_raise(self, new_required_total_player_contribution_to_pot, player_name):
+    def action_raise(self, new_required_total_player_contribution_to_pot):
         def player_action_raise(amount):
-            print(player_name + " raises to " + str(amount))
             return Action.ACTION_RAISE, new_required_total_player_contribution_to_pot
 
         return player_action_raise
 
-    def action_raise_call(self, new_required_total_player_contribution_to_pot, player_name):
+    def action_raise_call(self, new_required_total_player_contribution_to_pot):
         def raise_call(amount):
             if amount < new_required_total_player_contribution_to_pot:
-                print(player_name + " raises to " + str(new_required_total_player_contribution_to_pot))
                 return Action.ACTION_RAISE, new_required_total_player_contribution_to_pot
-            print(player_name + " calls " + str(amount))
             return Action.ACTION_CALL, amount
 
         return raise_call
 
-    def action_raise_reraise(self, raise_amount, player_name):
+    def action_raise_reraise(self, raise_amount):
         def raise_reraise(amount):
-            print(player_name + " raises to " + str(amount + raise_amount))
             return Action.ACTION_RAISE, amount + raise_amount
 
         return raise_reraise
 
-    def action_bet_fold(self, new_required_total_player_contribution_to_pot, player_name):
+    def action_bet_fold(self, new_required_total_player_contribution_to_pot):
         def raise_fold(amount):
             if amount < new_required_total_player_contribution_to_pot:
-                print(player_name + " raises to " + str(new_required_total_player_contribution_to_pot))
                 return Action.ACTION_RAISE, new_required_total_player_contribution_to_pot
-            print(player_name + " folds")
             return Action.ACTION_FOLD, 0
 
         return raise_fold
 
     def test_deal(self):
-        player1 = Player()
-        player2 = Player()
+        player1 = Player("player1", 1000)
+        player2 = Player("player2", 1000)
         seating = Seating([player1, player2])
         deck = Deck()
         deck.initialize()
@@ -81,9 +73,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 1000
         small_blind_size = 5
         big_blind_size = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        player2 = self.setup_new_player(initial_stack)
-        player3 = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        player2 = self.setup_new_player("SmallBlind", initial_stack)
+        player3 = self.setup_new_player("BigBlind", initial_stack)
         seating = Seating([button_player, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -107,9 +99,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind_size = small_blind_size * 2
-        button_player = self.setup_new_player(100)
-        player2 = self.setup_new_player(small_blind_size - 1)
-        player3 = self.setup_new_player(big_blind_size - 1)
+        button_player = self.setup_new_player("Button", 100)
+        player2 = self.setup_new_player("SmallBlind", small_blind_size - 1)
+        player3 = self.setup_new_player("BigBlind", big_blind_size - 1)
         seating = Seating([button_player, player2, player3])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -123,8 +115,8 @@ class TestDealer(unittest.TestCase):
         self.assertTrue(player3 in dealer.pot.players)
 
     def test_move_button__when2players(self):
-        initial_button_player = self.setup_new_player()
-        initial_bb_player = self.setup_new_player()
+        initial_button_player = self.setup_new_player("Button", 100)
+        initial_bb_player = self.setup_new_player("BigBlind", 100)
         seating = Seating([initial_button_player, initial_bb_player])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -136,11 +128,11 @@ class TestDealer(unittest.TestCase):
         seating.button_pos = 0
 
     def test_move_button__when5players(self):
-        player1 = self.setup_new_player()
-        player2 = self.setup_new_player()
-        initial_button_player = self.setup_new_player()
-        initial_sb_player = self.setup_new_player()
-        initial_bb_player = self.setup_new_player()
+        player1 = self.setup_new_player("Player1", 100)
+        player2 = self.setup_new_player("Player2", 100)
+        initial_button_player = self.setup_new_player("Button", 100)
+        initial_sb_player = self.setup_new_player("SmallBlind", 100)
+        initial_bb_player = self.setup_new_player("BigBlind", 100)
         seating = Seating([player1, player2, initial_button_player, initial_sb_player, initial_bb_player])
         deck = Deck()
         dealer = Dealer(deck, seating)
@@ -179,7 +171,7 @@ class TestDealer(unittest.TestCase):
         button_player = dealer.seating.players[0]
         sb_player = dealer.seating.players[1]
         bb_player = dealer.seating.players[2]
-        sb_player.act = self.action_check_call("SmallBlind")
+        sb_player.act = self.action_check_call()
         winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(sb_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 2, sb_player.stack)
@@ -187,12 +179,12 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - small_blind_size * 2, bb_player.stack)
 
     def setup_3_player_preflop_where_everybody_folds(self, initial_stack):
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
-        button_player.act = self.action_fold("Button")
-        sb_player.act = self.action_fold("SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        button_player.act = self.action_fold()
+        sb_player.act = self.action_fold()
+        bb_player.act = self.action_fold()
         seating = Seating([button_player, sb_player, bb_player])
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -205,7 +197,7 @@ class TestDealer(unittest.TestCase):
         button_player = dealer.seating.players[0]
         sb_player = dealer.seating.players[1]
         bb_player = dealer.seating.players[2]
-        button_player.act = self.action_check_call("Button")
+        button_player.act = self.action_check_call()
         winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 3, button_player.stack)
@@ -220,9 +212,9 @@ class TestDealer(unittest.TestCase):
         button_player = dealer.seating.players[0]
         sb_player = dealer.seating.players[1]
         bb_player = dealer.seating.players[2]
-        button_player.act = self.action_check_call("Button")
-        sb_player.act = self.action_check_call("SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        button_player.act = self.action_check_call()
+        sb_player.act = self.action_check_call()
+        bb_player.act = self.action_check_call()
         winner = dealer.play_preflop(small_blind_size)
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
@@ -240,9 +232,9 @@ class TestDealer(unittest.TestCase):
         button_player = dealer.seating.players[0]
         sb_player = dealer.seating.players[1]
         bb_player = dealer.seating.players[2]
-        button_player.act = self.action_check_call("Button")
-        sb_player.act = self.action_check_call("SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        button_player.act = self.action_check_call()
+        sb_player.act = self.action_check_call()
+        bb_player.act = self.action_check_call()
         dealer.play_preflop(small_blind_size)
         self.assertEqual(0, len(dealer.community_cards))
         self.assertEqual(DeckTests.deck_size - len(dealer.seating.players) * 2, len(dealer.deck.cards))
@@ -254,12 +246,12 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         bet_size = 50
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
-        button_player.act = self.action_check_call("Button")
-        sb_player.act = self.action_raise(bet_size, "SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        button_player.act = self.action_check_call()
+        sb_player.act = self.action_raise(bet_size)
+        bb_player.act = self.action_check_call()
         seating = Seating([button_player, sb_player, bb_player])
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -277,12 +269,12 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         bet_size = 50
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
-        button_player.act = self.action_raise(bet_size, "Button")
-        sb_player.act = self.action_check_call("SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
+        button_player.act = self.action_raise(bet_size)
+        sb_player.act = self.action_check_call()
+        bb_player.act = self.action_check_call()
         seating = Seating([button_player, sb_player, bb_player])
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -301,9 +293,9 @@ class TestDealer(unittest.TestCase):
         bet_size = 50
         raise_size = bet_size + 10
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
 
         def call_raise(player_name):
             def call_raise_action(amount):
@@ -328,7 +320,7 @@ class TestDealer(unittest.TestCase):
             return raise_call_action
 
         sb_player.act = raise_call("SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        bb_player.act = self.action_check_call()
         seating = Seating([button_player, sb_player, bb_player])
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -345,14 +337,14 @@ class TestDealer(unittest.TestCase):
     def test_playing_flop__when_all_fold__button_player_wins(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
-        button_player.act = self.action_fold("Button")
-        sb_player.act = self.action_fold("SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_fold()
+        sb_player.act = self.action_fold()
+        bb_player.act = self.action_fold()
         winner = dealer.play_flop()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 4, button_player.stack)
@@ -360,14 +352,14 @@ class TestDealer(unittest.TestCase):
     def test_playing_flop__when_bb_checks_and_others_fold__bb_player_wins(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
-        button_player.act = self.action_fold("Button")
-        sb_player.act = self.action_fold("SmallBlind")
-        bb_player.act = self.action_check_call("BigBlind")
+        button_player.act = self.action_fold()
+        sb_player.act = self.action_fold()
+        bb_player.act = self.action_check_call()
         winner = dealer.play_flop()
         self.assertEqual(bb_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 4, bb_player.stack)
@@ -376,9 +368,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
         winner = dealer.play_flop()
@@ -394,9 +386,9 @@ class TestDealer(unittest.TestCase):
     def test_playing_flop__when_all_checks__cards_dealt_correctly(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
         dealer.play_flop()
@@ -416,9 +408,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 20
-        players = [self.setup_new_player(initial_stack) for _ in range(player_count)]
+        players = [self.setup_new_player("Player" + str(i), initial_stack) for i in range(player_count)]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
-        players[player_count - 1].act = self.action_raise(bet_size, "Player")
+        players[player_count - 1].act = self.action_raise(bet_size)
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
         self.assertTrue(all(p in dealer.pot.players for p in players))
@@ -437,15 +429,15 @@ class TestDealer(unittest.TestCase):
         small_blind_size = 10
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + bet_amount
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_check_call("Button")
-        sb_player.act = self.action_raise(bet_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_check_call()
+        sb_player.act = self.action_raise(bet_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
@@ -462,15 +454,15 @@ class TestDealer(unittest.TestCase):
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 30
         raise_size = bet_size + 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_raise(raise_size, "Button")
-        sb_player.act = self.action_raise_call(bet_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_raise(raise_size)
+        sb_player.act = self.action_raise_call(bet_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
@@ -487,15 +479,15 @@ class TestDealer(unittest.TestCase):
         big_blind_size = small_blind_size * 2
         bet_size = 40
         raise_size = 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_raise_call(bet_size, "Button")
-        sb_player.act = self.action_raise_reraise(raise_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_raise_call(bet_size)
+        sb_player.act = self.action_raise_reraise(raise_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_flop()
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
@@ -512,15 +504,15 @@ class TestDealer(unittest.TestCase):
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 30
         raise_size = bet_size + 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_raise(raise_size, "Button")
-        sb_player.act = self.action_bet_fold(bet_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_raise(raise_size)
+        sb_player.act = self.action_bet_fold(bet_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_flop()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack - bet_size, sb_player.stack)
@@ -543,9 +535,9 @@ class TestDealer(unittest.TestCase):
 
         initial_stack = 1000
         small_blind_size = 10
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
@@ -562,7 +554,7 @@ class TestDealer(unittest.TestCase):
 
     def setup_dealer_and_play_preflop_where_everybody_calls(self, players, small_blind_size):
         for player in players:
-            player.act = self.action_check_call("Player")
+            player.act = self.action_check_call()
         seating = Seating(players)
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -573,7 +565,7 @@ class TestDealer(unittest.TestCase):
 
     def setup_dealer_and_play_flop_where_everybody_calls(self, players, small_blind_size):
         for player in players:
-            player.act = self.action_check_call("Player")
+            player.act = self.action_check_call()
         seating = Seating(players)
         dealer = Dealer(None, seating)
         dealer.setup_deck()
@@ -585,9 +577,10 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(None, winner)
         return dealer
 
-    def setup_dealer_and_play_turn_where_everybody_calls(self, players, small_blind_size, random_seed_for_shuffling = None):
+    def setup_dealer_and_play_turn_where_everybody_calls(self, players, small_blind_size,
+                                                         random_seed_for_shuffling=None):
         for player in players:
-            player.act = self.action_check_call("Player")
+            player.act = self.action_check_call()
         seating = Seating(players)
         dealer = Dealer(None, seating, random_seed_for_shuffling)
         dealer.setup_deck()
@@ -605,14 +598,14 @@ class TestDealer(unittest.TestCase):
     def test_playing_turn__when_all_fold__button_player_wins(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_flop_where_everybody_calls(players, small_blind_size)
-        button_player.act = self.action_fold("Button")
-        sb_player.act = self.action_fold("SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_fold()
+        sb_player.act = self.action_fold()
+        bb_player.act = self.action_fold()
         winner = dealer.play_turn()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 4, button_player.stack)
@@ -621,9 +614,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_flop_where_everybody_calls(players, small_blind_size)
         winner = dealer.play_turn()
@@ -639,9 +632,9 @@ class TestDealer(unittest.TestCase):
     def test_playing_turn__when_all_checks__cards_dealt_correctly(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_flop_where_everybody_calls(players, small_blind_size)
         dealer.play_turn()
@@ -654,15 +647,15 @@ class TestDealer(unittest.TestCase):
         big_blind_size = small_blind_size * 2
         bet_size = 40
         raise_size = 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_flop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_raise_call(bet_size, "Button")
-        sb_player.act = self.action_raise_reraise(raise_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_raise_call(bet_size)
+        sb_player.act = self.action_raise_reraise(raise_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_turn()
         self.assertEqual(None, winner)
         self.assertTrue(button_player in dealer.pot.players)
@@ -676,14 +669,14 @@ class TestDealer(unittest.TestCase):
     def test_playing_river__when_all_fold__button_player_wins(self):
         initial_stack = 100
         small_blind_size = 5
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
-        button_player.act = self.action_fold("Button")
-        sb_player.act = self.action_fold("SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_fold()
+        sb_player.act = self.action_fold()
+        bb_player.act = self.action_fold()
         winner = dealer.play_river()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack + small_blind_size * 4, button_player.stack)
@@ -694,15 +687,15 @@ class TestDealer(unittest.TestCase):
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 30
         raise_size = bet_size + 20
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_raise(raise_size, "Button")
-        sb_player.act = self.action_bet_fold(bet_size, "SmallBlind")
-        bb_player.act = self.action_fold("BigBlind")
+        button_player.act = self.action_raise(raise_size)
+        sb_player.act = self.action_bet_fold(bet_size)
+        bb_player.act = self.action_fold()
         winner = dealer.play_river()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack - bet_size, sb_player.stack)
@@ -713,9 +706,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         random_seed_for_shuffling = 4
         # seed value 4 results in shuffling where Button has a high card, SmallBlind with Flush, BigBlind with a Pair.
@@ -731,9 +724,9 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         random_seed_for_shuffling = 2
         # seed value 2 results in shuffling where Button has a Pair, SmallBlind with High Card, BigBlind with a Pair, but BigBlind has a better 2nd kicker
@@ -749,15 +742,15 @@ class TestDealer(unittest.TestCase):
         initial_stack = 100
         small_blind_size = 5
         big_blind = small_blind_size * 2
-        button_player = self.setup_new_player(initial_stack)
-        sb_player = self.setup_new_player(initial_stack)
-        bb_player = self.setup_new_player(initial_stack)
+        button_player = self.setup_new_player("Button", initial_stack)
+        sb_player = self.setup_new_player("SmallBlind", initial_stack)
+        bb_player = self.setup_new_player("BigBlind", initial_stack)
         players = [button_player, sb_player, bb_player]
         random_seed_for_shuffling = 2
         # seed value 2 results in shuffling where Button has a Pair, SmallBlind with High Card, BigBlind with a Pair, but BigBlind has a better 2nd kicker
         dealer = self.setup_dealer_and_play_turn_where_everybody_calls(players, small_blind_size,
                                                                        random_seed_for_shuffling)
-        bb_player.act = self.action_fold("BigBlind")
+        bb_player.act = self.action_fold()
         winner = dealer.play_river()
         self.assertEqual(button_player, winner)
         self.assertEqual(initial_stack + big_blind * 2, button_player.stack)

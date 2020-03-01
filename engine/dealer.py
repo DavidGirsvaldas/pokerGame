@@ -84,10 +84,13 @@ class Dealer:
         for i in range(amount_of_calls_to_make):
             p_action, p_amount = next_player.act(new_raised_amount)
             if p_action == Action.ACTION_FOLD:
+                print(str(next_player) + " folds")
                 self.player_folds(next_player)
             elif p_action == Action.ACTION_CALL:
+                print(str(next_player) + " calls " + str(p_amount))
                 self.player_calls(next_player, p_amount)
             elif p_action == Action.ACTION_RAISE:
+                print(str(next_player) + " raises to " + str(p_amount))
                 self.player_calls(next_player, p_amount)
                 return self.ask_players_for_actions(next_player, p_amount, False)
             if self.is_winner_determined():
