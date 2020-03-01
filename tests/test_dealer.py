@@ -15,7 +15,8 @@ class TestDealer(unittest.TestCase):
         player = Player(name, initial_stack)
         return player
 
-    def action_check_call(self):
+    @staticmethod
+    def action_check_call():
         def player_action_call(amount):
             return Action.ACTION_CALL, amount
 
@@ -475,7 +476,7 @@ class TestDealer(unittest.TestCase):
 
     def test_playing_flop_when_player_raises_and_is_reraised_by_original_betting_player(self):
         initial_stack = 100
-        small_blind_size = 10
+        small_blind_size = 5
         big_blind_size = small_blind_size * 2
         bet_size = 40
         raise_size = 20

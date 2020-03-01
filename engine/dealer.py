@@ -6,11 +6,12 @@ from engine.pot import Pot
 
 class Dealer:
 
-    def __init__(self, deck, seating, random_seed_for_shuffling = None):
+    def __init__(self, deck, seating, random_seed_for_shuffling=None):
         self.community_cards = []
         self.deck = deck
         self.seating = seating
         self.pot = None
+        self.big_blind_size = None
         self.random_seed_for_shuffling = random_seed_for_shuffling
 
     def deal_cards_to_players(self):
@@ -48,6 +49,7 @@ class Dealer:
             self.pot.players.append(player)
 
     def play_preflop(self, small_blind_size):
+        self.big_blind_size = small_blind_size * 2
         self.pot = Pot()
         self.collect_blinds(small_blind_size)
         self.deal_cards_to_players()
@@ -58,17 +60,17 @@ class Dealer:
     def play_flop(self):
         self.add_community_cards(3)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10,True)  # todo remove assumption that big blind size is always 10
+        return self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
 
     def play_turn(self):
         self.add_community_cards(1)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        return self.ask_players_for_actions(last_player_to_go, 10,True)  # todo remove assumption that big blind size is always 10
+        return self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
 
     def play_river(self):
         self.add_community_cards(1)
         last_player_to_go = self.seating.players[0]  # todo remove assumption that button sits at position 0
-        winner = self.ask_players_for_actions(last_player_to_go, 10,True)  # todo remove assumption that big blind size is always 10
+        winner = self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
         if winner:
             return winner
         else:
