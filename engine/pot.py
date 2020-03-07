@@ -33,13 +33,13 @@ class Pot:
             side_pot = Pot()
             self.pots.append(side_pot)
             for p in self.pots[0].players:
-                split_amount = p.money_in_pot - player.money_in_pot
+                split_amount = self.pots[0].players[p] - self.pots[0].players[player]
                 if split_amount > 0:
                     side_pot.players[p] = split_amount
                     self.pots[0].players[p] -= split_amount
 
-    def is_pot_closed(self):
-        for player in self.pots[0].players.keys():
+    def is_pot_closed(self, pot):
+        for player in pot.players.keys():
             if player.stack is 0:
                 return True
         return False
