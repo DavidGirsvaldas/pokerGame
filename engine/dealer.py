@@ -22,12 +22,14 @@ class Dealer:
         self.seating.move_button()
 
     def collect_blinds(self, small_blind_size):
+        for player in self.seating.players:
+            player.money_in_pot = 0
         sb_player = self.seating.small_blind_player()
         bb_player = self.seating.big_blind_player()
         available_size_of_small_blind = min(small_blind_size, sb_player.stack)
-        self.take_chips(sb_player, available_size_of_small_blind)
+        self.pot.player_calls(sb_player, available_size_of_small_blind)
         available_size_of_big_blind = min(small_blind_size * 2, bb_player.stack)
-        self.take_chips(bb_player, available_size_of_big_blind)
+        self.pot.player_calls(bb_player, available_size_of_big_blind)
 
     def setup_deck(self):
         self.deck = Deck()
@@ -37,13 +39,6 @@ class Dealer:
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
         print("Community cards: " + ", ".join([str(card) for card in self.community_cards]))
-
-    def take_chips(self, player, amount):
-        player.stack -= amount
-        player.money_in_pot += amount
-        if player not in self.pot.players:
-            self.pot.players[player] = 0
-        self.pot.players[player] += amount
 
     def play_preflop(self, small_blind_size):
         self.big_blind_size = small_blind_size * 2
@@ -88,32 +83,15 @@ class Dealer:
                     self.player_folds(next_player)
                 elif p_action == Action.ACTION_CALL:
                     print(str(next_player) + " calls " + str(p_amount))
-                    self.player_calls(next_player, p_amount)
+                    self.pot.player_calls(next_player, p_amount)
                 elif p_action == Action.ACTION_RAISE:
                     print(str(next_player) + " raises to " + str(p_amount))
-                    self.player_calls(next_player, p_amount)
+                    self.pot.player_calls(next_player, p_amount)
                     return self.ask_players_for_actions(next_player, p_amount, False)
                 if self.is_winner_determined():
                     winner = list(self.pot.players.keys())[0]
                     return self.award_player_as_winner(winner)
             next_player = self.seating.next_player_after_player(next_player)
-
-    def player_calls(self, player, amount):
-        amount_to_add = amount - player.money_in_pot
-        player.stack -= amount_to_add
-        if player not in self.pot.players:
-            self.pot.players[player] = 0
-        self.pot.players[player] += amount_to_add
-        player.money_in_pot += amount_to_add
-        required_amount_in_pot = max(p.money_in_pot for p in self.pot.players)
-        if player.money_in_pot < required_amount_in_pot:
-            pot2 = Pot()
-            for p in self.pot.players:
-                split_amount = p.money_in_pot - player.money_in_pot
-                if split_amount > 0:
-                    pot2.players += p
-                    pot2.size += split_amount
-                    self.pot.size -= split_amount
 
     def is_winner_determined(self):
         return len(self.pot.players) == 1
