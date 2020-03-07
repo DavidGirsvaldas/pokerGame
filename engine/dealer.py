@@ -41,9 +41,9 @@ class Dealer:
     def take_chips(self, player, amount):
         player.stack -= amount
         player.money_in_pot += amount
-        self.pot.size += amount
         if player not in self.pot.players:
-            self.pot.players.append(player)
+            self.pot.players[player] = 0
+        self.pot.players[player] += amount
 
     def play_preflop(self, small_blind_size):
         self.big_blind_size = small_blind_size * 2
@@ -81,7 +81,7 @@ class Dealer:
         if not include_last_player:
             amount_of_calls_to_make -= 1
         for i in range(amount_of_calls_to_make):
-            if next_player.cards:
+            if next_player.cards and next_player.stack > 0:
                 p_action, p_amount = next_player.act(new_raised_amount)
                 if p_action == Action.ACTION_FOLD:
                     print(str(next_player) + " folds")
@@ -94,30 +94,37 @@ class Dealer:
                     self.player_calls(next_player, p_amount)
                     return self.ask_players_for_actions(next_player, p_amount, False)
                 if self.is_winner_determined():
-                    return self.award_winner()
+                    winner = list(self.pot.players.keys())[0]
+                    return self.award_player_as_winner(winner)
             next_player = self.seating.next_player_after_player(next_player)
 
     def player_calls(self, player, amount):
-        player.stack -= amount - player.money_in_pot
+        amount_to_add = amount - player.money_in_pot
+        player.stack -= amount_to_add
         if player not in self.pot.players:
-            self.pot.players.append(player)
-        self.pot.size += amount - player.money_in_pot
-        player.money_in_pot += amount - player.money_in_pot
+            self.pot.players[player] = 0
+        self.pot.players[player] += amount_to_add
+        player.money_in_pot += amount_to_add
+        required_amount_in_pot = max(p.money_in_pot for p in self.pot.players)
+        if player.money_in_pot < required_amount_in_pot:
+            pot2 = Pot()
+            for p in self.pot.players:
+                split_amount = p.money_in_pot - player.money_in_pot
+                if split_amount > 0:
+                    pot2.players += p
+                    pot2.size += split_amount
+                    self.pot.size -= split_amount
 
     def is_winner_determined(self):
         return len(self.pot.players) == 1
 
-    def award_winner(self):
-        winner = self.pot.players[0]
-        winner.stack += self.pot.size
+    def award_player_as_winner(self, winner):
+        winner.stack += self.pot.total_count()
         return winner
-
-    def award_player_as_winner(self, player):
-        player.stack += self.pot.size
-        return player
 
     def player_folds(self, player):
         player.money_in_pot = 0
         player.cards = None
         if player in self.pot.players:
-            self.pot.players.remove(player)
+            self.pot.size += self.pot.players[player]
+            self.pot.players.pop(player, None)

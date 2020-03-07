@@ -45,7 +45,8 @@ class TestDealer(unittest.TestCase):
         player_action_raise.times_called = 0
         return player_action_raise
 
-    def action_raise(self, new_required_total_player_contribution_to_pot):
+    @staticmethod
+    def action_raise(new_required_total_player_contribution_to_pot):
         def player_action_raise(amount):
             return Action.ACTION_RAISE, new_required_total_player_contribution_to_pot
 
@@ -102,14 +103,14 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack, button_player.stack)
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - big_blind_size, player3.stack)
-        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.size)
+        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.total_count())
         dealer.move_button()
         dealer.pot = Pot()
         dealer.collect_blinds(small_blind_size)
         self.assertEqual(initial_stack - big_blind_size, button_player.stack)
         self.assertEqual(initial_stack - small_blind_size, player2.stack)
         self.assertEqual(initial_stack - big_blind_size - small_blind_size, player3.stack)
-        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.size)
+        self.assertEqual(big_blind_size + small_blind_size, dealer.pot.total_count())
         self.assertTrue(button_player in dealer.pot.players)
         self.assertTrue(player3 in dealer.pot.players)
 
@@ -128,7 +129,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack, button_player.stack)
         self.assertEqual(0, player2.stack)
         self.assertEqual(0, player3.stack)
-        self.assertEqual(13, dealer.pot.size)
+        self.assertEqual(13, dealer.pot.total_count())
         self.assertTrue(player2 in dealer.pot.players)
         self.assertTrue(player3 in dealer.pot.players)
 
@@ -241,7 +242,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - big_blind_size, button_player.stack)
         self.assertEqual(initial_stack - big_blind_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(big_blind_size * 3, dealer.pot.size)
+        self.assertEqual(big_blind_size * 3, dealer.pot.total_count())
 
     def test_preflop_round__when_all_calls__correct_state_of_cards_dealt(self):
         initial_stack = 100
@@ -281,7 +282,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - bet_size, button_player.stack)
         self.assertEqual(initial_stack - bet_size, sb_player.stack)
         self.assertEqual(initial_stack - bet_size, bb_player.stack)
-        self.assertEqual(bet_size * 3, dealer.pot.size)
+        self.assertEqual(bet_size * 3, dealer.pot.total_count())
 
     def test_preflop_round__when_first_player_bets__all_calls(self):
         initial_stack = 100
@@ -304,7 +305,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - bet_size, button_player.stack)
         self.assertEqual(initial_stack - bet_size, sb_player.stack)
         self.assertEqual(initial_stack - bet_size, bb_player.stack)
-        self.assertEqual(bet_size * 3, dealer.pot.size)
+        self.assertEqual(bet_size * 3, dealer.pot.total_count())
 
     def test_preflop_round__when_player_raises__all_calls(self):
         initial_stack = 100
@@ -350,7 +351,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - raise_size, button_player.stack)
         self.assertEqual(initial_stack - raise_size, sb_player.stack)
         self.assertEqual(initial_stack - raise_size, bb_player.stack)
-        self.assertEqual(raise_size * 3, dealer.pot.size)
+        self.assertEqual(raise_size * 3, dealer.pot.total_count())
 
     def test_playing_flop__when_all_fold__button_player_wins(self):
         initial_stack = 100
@@ -399,7 +400,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - big_blind, button_player.stack)
         self.assertEqual(initial_stack - big_blind, sb_player.stack)
         self.assertEqual(initial_stack - big_blind, bb_player.stack)
-        self.assertEqual(big_blind * 3, dealer.pot.size)
+        self.assertEqual(big_blind * 3, dealer.pot.total_count())
 
     def test_playing_flop__when_all_checks__cards_dealt_correctly(self):
         initial_stack = 100
@@ -433,7 +434,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(None, winner)
         self.assertTrue(all(p in dealer.pot.players for p in players))
         self.assertTrue(all(p.stack == initial_stack - bet_size for p in players))
-        self.assertEqual(bet_size * player_count, dealer.pot.size)
+        self.assertEqual(bet_size * player_count, dealer.pot.total_count())
 
     def test_playing_flop__when_player_bets_20__one_folds_another_calls(self):
         self.execute_test_of_player_betting_post_flop(20)
@@ -464,7 +465,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - bet_size, button_player.stack)
         self.assertEqual(initial_stack - bet_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(bet_size * 2 + big_blind_size, dealer.pot.size)
+        self.assertEqual(bet_size * 2 + big_blind_size, dealer.pot.total_count())
 
     def test_playing_flop_when_player_raises_and_is_called_by_original_betting_player(self):
         initial_stack = 100
@@ -489,7 +490,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - raise_size, button_player.stack)
         self.assertEqual(initial_stack - raise_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(raise_size * 2 + big_blind_size, dealer.pot.size)
+        self.assertEqual(raise_size * 2 + big_blind_size, dealer.pot.total_count())
 
     def test_playing_flop_when_player_raises_and_is_reraised_by_original_betting_player(self):
         initial_stack = 100
@@ -514,7 +515,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - bet_size - raise_size, button_player.stack)
         self.assertEqual(initial_stack - bet_size - raise_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(raise_size * 2 + bet_size * 2 + big_blind_size, dealer.pot.size)
+        self.assertEqual(raise_size * 2 + bet_size * 2 + big_blind_size, dealer.pot.total_count())
 
     def test_playing_flop_when_player_raises_and_original_betting_player_folds(self):
         initial_stack = 100
@@ -645,7 +646,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - big_blind, button_player.stack)
         self.assertEqual(initial_stack - big_blind, sb_player.stack)
         self.assertEqual(initial_stack - big_blind, bb_player.stack)
-        self.assertEqual(big_blind * 3, dealer.pot.size)
+        self.assertEqual(big_blind * 3, dealer.pot.total_count())
 
     def test_playing_turn__when_all_checks__cards_dealt_correctly(self):
         initial_stack = 100
@@ -682,7 +683,7 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(initial_stack - bet_size - raise_size, button_player.stack)
         self.assertEqual(initial_stack - bet_size - raise_size, sb_player.stack)
         self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(raise_size * 2 + bet_size * 2 + big_blind_size, dealer.pot.size)
+        self.assertEqual(raise_size * 2 + bet_size * 2 + big_blind_size, dealer.pot.total_count())
 
     def test_playing_river__when_all_fold__button_player_wins(self):
         initial_stack = 100

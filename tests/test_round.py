@@ -108,3 +108,28 @@ class TestRound(unittest.TestCase):
         player4.name = "BigBlind"
         winner = round.play_round()
         self.assertEqual("BigBlind", winner.name)
+
+    def test_play_round__when_players_allin_with_unequal_stacks___side_pots_are_formed(self):
+        stack_player1 = 1000
+        stack_player2 = 3300
+        stack_player3 = 7500
+        stack_player4 = 30000
+        player1 = self.setup_new_player("Button", stack_player1)
+        player2 = self.setup_new_player("SmallBlind", stack_player2)
+        player3 = self.setup_new_player("BigBlind", stack_player3)
+        player4 = self.setup_new_player("UTG", stack_player4)
+        player1.act = TestDealer.action_raise(stack_player1)
+        player2.act = TestDealer.action_raise(stack_player2)
+        player3.act = TestDealer.action_raise(stack_player3)
+        player4.act = TestDealer.action_raise(stack_player4)
+        seating = Seating([player1, player2, player3, player4])
+        dealer = Dealer(None, seating, 1)
+        # with seed 1 SmallBlind wins with pair of 6s
+        # side pot goes to UTG with pair of 4s
+        round = Round(dealer)
+        winner = round.play_round()
+        self.assertEqual("SmallBlind", winner.name)
+        self.assertEqual(0, player1.stack)
+        self.assertEqual(stack_player2 * 3 + stack_player1, player2.stack)
+        self.assertEqual(0, player3.stack)
+        self.assertEqual(stack_player3 - stack_player2, player4.stack)
