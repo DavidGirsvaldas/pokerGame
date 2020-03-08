@@ -127,3 +127,33 @@ class TestPot(unittest.TestCase):
         self.assertTrue(player1 in side_pot.players)
         self.assertTrue(player2 not in side_pot.players)
         self.assertTrue(player3 not in side_pot.players)
+
+    def test_player_calls__when_players_allin_after_placing_blinds(self):
+        player1 = Player("Player1", 1000)
+        player2 = Player("Player2", 600)
+        player3 = Player("Player3", 200)
+        pot = Pot()
+        pot.player_calls(player2, 5)
+        pot.player_calls(player3, 200)
+        pot.player_calls(player1, 1000)
+        pot.player_calls(player2, 600)
+
+        pots = pot.get_all_pots()
+        self.assertEqual(3, len(pots))
+        main_pot = pots[0]
+        self.assertEqual(600, main_pot.pot_size())
+        self.assertTrue(player1 in main_pot.players)
+        self.assertTrue(player2 in main_pot.players)
+        self.assertTrue(player3 in main_pot.players)
+
+        side_pot = pots[1]
+        self.assertEqual(800, side_pot.pot_size())
+        self.assertTrue(player1 in side_pot.players)
+        self.assertTrue(player2 in side_pot.players)
+        self.assertTrue(player3 not in side_pot.players)
+
+        side_pot = pots[2]
+        self.assertEqual(400, side_pot.pot_size())
+        self.assertTrue(player1 in side_pot.players)
+        self.assertTrue(player2 not in side_pot.players)
+        self.assertTrue(player3 not in side_pot.players)

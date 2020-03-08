@@ -31,7 +31,8 @@ class Pot:
                 amount_to_leave_in_pot = 99999 # todo -ugly! refactor
                 if self.pot_max_size():
                     amount_to_leave_in_pot = self.pot_max_size()
-                split_amount = self.players[p] - min(self.players[player], amount_to_leave_in_pot)
+                in_pot = self.players[player]
+                split_amount = self.players[p] - min(in_pot, amount_to_leave_in_pot)
                 if split_amount > 0:
                     if not self.side_pot:
                         self.side_pot = Pot()
@@ -48,7 +49,7 @@ class Pot:
         return pots
 
     def pot_max_size(self):
-        for player in self.players.keys():
-            if player.stack is 0:
-                return self.players[player]
-        return None
+        all_in_players = [player for player in self.players.keys() if player.stack is 0]
+        if len(all_in_players) is 0:
+            return None
+        return min([self.players[player] for player in all_in_players])

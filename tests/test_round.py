@@ -35,9 +35,8 @@ class TestRound(unittest.TestCase):
         seed = 2
         dealer = Dealer(None, seating, seed)
         round = Round(dealer)
-        winner = round.play_round()
-        self.assertEqual("SmallBlind", winner.name)
-        self.assertEqual(1150, winner.stack)
+        round.play_round()
+        self.assertEqual(1150, sb_player.stack)
 
     def test_play_round__when_player_wins_in_preflop__round_concludes(self):
         initial_stack = 1000
@@ -127,9 +126,8 @@ class TestRound(unittest.TestCase):
         # with seed 1 SmallBlind wins with pair of 6s
         # side pot goes to UTG with pair of 4s
         round = Round(dealer)
-        winner = round.play_round()
-        self.assertEqual("SmallBlind", winner.name)
+        round.play_round()
         self.assertEqual(0, player1.stack)
         self.assertEqual(stack_player2 * 3 + stack_player1, player2.stack)
         self.assertEqual(0, player3.stack)
-        self.assertEqual(stack_player3 - stack_player2, player4.stack)
+        self.assertEqual(stack_player4 - stack_player2 * 2 + stack_player3, player4.stack)

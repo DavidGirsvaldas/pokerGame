@@ -4,7 +4,7 @@ from engine.card import Card
 from engine.deck import Deck
 
 
-class DeckTests(unittest.TestCase):
+class TestDeck(unittest.TestCase):
     deck_size = 52
 
     def test_init_deck(self):

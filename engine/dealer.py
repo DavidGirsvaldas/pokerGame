@@ -67,8 +67,9 @@ class Dealer:
             return winner
         else:
             # todo bug. can be more than one winner
-            winner = card_showdown.find_winner(self.pot.players, self.community_cards)[0]
-            return self.award_player_as_winner(winner)
+            for pot in self.pot.get_all_pots():
+                winner = card_showdown.find_winners(pot.players, self.community_cards)[0]
+                winner.stack += pot.pot_size()
 
     def ask_players_for_actions(self, player_who_raised, new_raised_amount, include_last_player):
         next_player = self.seating.next_player_after_player(player_who_raised)
@@ -97,7 +98,7 @@ class Dealer:
         return len(self.pot.players) == 1
 
     def award_player_as_winner(self, winner):
-        winner.stack += self.pot.total_count()
+        winner.stack += self.pot.pot_size()
         return winner
 
     def player_folds(self, player):

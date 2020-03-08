@@ -6,7 +6,7 @@ from engine.player import Player
 from engine import combination_finder
 
 
-def find_winner(players: [Player], common_cards: [Card]):
+def find_winners(players: [Player], common_cards: [Card]):
     if len(common_cards) < 5:
         raise ValueError("Expected 5 community cards, found " + str(len(common_cards)))
     combo_by_player = defaultdict()
