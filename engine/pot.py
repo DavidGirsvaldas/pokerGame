@@ -9,15 +9,14 @@ class Pot:
         self.side_pot = None
 
     def total_count(self):
-        amount = self.size
-        for _, players_chips_in_pot in self.players.items():
-            amount += players_chips_in_pot
-        return amount
+        total_amount = 0
+        for pot in self.get_all_pots():
+            total_amount += pot.pot_size()
+        return total_amount
 
     def pot_size(self):
         amount = self.size
-        for _, players_chips_in_pot in self.players.items():
-            amount += players_chips_in_pot
+        amount += sum(self.players.values())
         return amount
 
     def player_calls(self, player, amount):
@@ -25,16 +24,19 @@ class Pot:
         player.stack -= amount_to_add
         self.players[player] += amount_to_add
         player.money_in_pot += amount_to_add
-        required_amount_in_pot = max(self.players.values())
-        player_doesnt_have_enough = self.players[player] < required_amount_in_pot
+        player_doesnt_have_enough = self.players[player] < max(self.players.values())
         other_pot_players_cant_match_bet_made = self.pot_max_size() and self.players[player] > self.pot_max_size()
         if player_doesnt_have_enough or other_pot_players_cant_match_bet_made:
             for p in self.players:
-                split_amount = self.players[p] - self.players[player]
+                amount_to_leave_in_pot = 99999 # todo -ugly! refactor
+                if self.pot_max_size():
+                    amount_to_leave_in_pot = self.pot_max_size()
+                split_amount = self.players[p] - min(self.players[player], amount_to_leave_in_pot)
                 if split_amount > 0:
                     if not self.side_pot:
                         self.side_pot = Pot()
                     self.players[p] -= split_amount
+                    p.stack += split_amount
                     self.side_pot.player_calls(p, split_amount + self.side_pot.players[p])
 
     def get_all_pots(self):

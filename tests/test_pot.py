@@ -116,11 +116,11 @@ class TestPot(unittest.TestCase):
         self.assertTrue(player2 in main_pot.players)
         self.assertTrue(player3 in main_pot.players)
 
-        side_pot = pots[3]
+        side_pot = pots[1]
         self.assertEqual(800, side_pot.pot_size())
         self.assertTrue(player1 in side_pot.players)
         self.assertTrue(player2 in side_pot.players)
-        self.assertTrue(player3 in side_pot.players)
+        self.assertTrue(player3 not in side_pot.players)
 
         side_pot = pots[2]
         self.assertEqual(399, side_pot.pot_size())
