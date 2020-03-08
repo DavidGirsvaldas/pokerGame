@@ -26,4 +26,4 @@ players = [console_player, button_player, sb_player, bb_player]
 seating = Seating(players)
 dealer = Dealer(None, seating)
 round = Round(dealer)
-round.play_round()
+round.play_round(5)

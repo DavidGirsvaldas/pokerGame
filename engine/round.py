@@ -3,10 +3,9 @@ class Round:
     def __init__(self, dealer):
         self.dealer = dealer
 
-    def play_round(self):
+    def play_round(self, small_blind):
         self.dealer.setup_deck()
-        # todo remove assumption small blind always 5
-        winner = self.dealer.play_preflop(5)
+        winner = self.dealer.play_preflop(small_blind)
         if winner:
             self.dealer.move_button()
             return winner
