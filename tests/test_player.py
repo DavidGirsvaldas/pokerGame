@@ -1,6 +1,6 @@
 import unittest
 
-from pokerGame.engine.player import Player
+from engine.player import Player
 
 
 class TestPlayer(unittest.TestCase):

@@ -1,10 +1,10 @@
 from typing import Iterable, List
 
-from pokerGame.engine.card import Card
-from pokerGame.engine.combination import Combination
+from engine.card import Card
+from engine.combination import Combination
 from collections import defaultdict
 
-from pokerGame.engine.rank import Rank
+from engine.rank import Rank
 
 
 def find_high_card(cards: Iterable[Card]):

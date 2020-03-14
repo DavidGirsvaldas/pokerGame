@@ -1,7 +1,7 @@
-from pokerGame.engine import card_showdown
-from pokerGame.engine.action import Action
-from pokerGame.engine.deck import Deck
-from pokerGame.engine.pot import Pot
+from engine import card_showdown
+from engine.action import Action
+from engine.deck import Deck
+from engine.pot import Pot
 
 
 class Dealer:

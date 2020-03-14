@@ -1,9 +1,9 @@
-from pokerGame.engine.action import Action
-from pokerGame.engine.console_player import ConsolePlayer
-from pokerGame.engine.dealer import Dealer
-from pokerGame.engine.game_settings import DefaultGameSettings
-from pokerGame.engine.round import Round
-from pokerGame.engine.seating import Seating
+from engine.action import Action
+from engine.console_player import ConsolePlayer
+from engine.dealer import Dealer
+from engine.game_settings import DefaultGameSettings
+from engine.round import Round
+from engine.seating import Seating
 
 
 def action_check_call():

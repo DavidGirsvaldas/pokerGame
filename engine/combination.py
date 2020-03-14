@@ -1,4 +1,4 @@
-from pokerGame.engine.rank import Rank
+from engine.rank import Rank
 
 
 class Combination:

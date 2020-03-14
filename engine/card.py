@@ -1,5 +1,5 @@
-from pokerGame.engine.suit import Suit
-from pokerGame.engine.rank import Rank
+from engine.suit import Suit
+from engine.rank import Rank
 
 
 class Card:

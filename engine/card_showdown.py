@@ -1,9 +1,9 @@
 from collections import defaultdict
 
-from pokerGame.engine.card import Card
-from pokerGame.engine.combination import Combination
-from pokerGame.engine.player import Player
-from pokerGame.engine import combination_finder
+from engine.card import Card
+from engine.combination import Combination
+from engine.player import Player
+from engine import combination_finder
 
 
 def find_winners(players: [Player], common_cards: [Card]):
