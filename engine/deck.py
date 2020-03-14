@@ -1,6 +1,6 @@
-from engine.rank import Rank
-from engine.suit import Suit
-from engine.card import Card
+from pokerGame.engine.rank import Rank
+from pokerGame.engine.suit import Suit
+from pokerGame.engine.card import Card
 import random
 
 

@@ -1,5 +1,5 @@
-from engine.action import Action
-from engine.player import Player
+from pokerGame.engine.action import Action
+from pokerGame.engine.player import Player
 
 
 class ConsolePlayer(Player):

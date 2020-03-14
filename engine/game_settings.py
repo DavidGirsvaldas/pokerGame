@@ -1,5 +1,5 @@
-from engine.console_player import ConsolePlayer
-from engine.player import Player
+from pokerGame.engine.console_player import ConsolePlayer
+from pokerGame.engine.player import Player
 
 
 class DefaultGameSettings:

@@ -1,10 +1,10 @@
 import unittest
 
-from engine import card_showdown
-from engine.card import Card
-from engine.player import Player
-from engine.rank import Rank
-from engine.suit import Suit
+from pokerGame.engine import card_showdown
+from pokerGame.engine.card import Card
+from pokerGame.engine.player import Player
+from pokerGame.engine.rank import Rank
+from pokerGame.engine.suit import Suit
 
 
 class CardShowdownTests(unittest.TestCase):

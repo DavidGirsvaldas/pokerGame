@@ -1,12 +1,12 @@
 import unittest
 
-from engine.action import Action
-from engine.dealer import Dealer
-from engine.deck import Deck
-from engine.player import Player
-from engine.pot import Pot
-from engine.seating import Seating
-from tests.test_deck import TestDeck
+from pokerGame.engine.action import Action
+from pokerGame.engine.dealer import Dealer
+from pokerGame.engine.deck import Deck
+from pokerGame.engine.player import Player
+from pokerGame.engine.pot import Pot
+from pokerGame.engine.seating import Seating
+from pokerGame.tests.test_deck import TestDeck
 
 
 class TestDealer(unittest.TestCase):

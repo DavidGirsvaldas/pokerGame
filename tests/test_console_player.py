@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from engine.console_player import ConsolePlayer
-from engine.action import Action
+from pokerGame.engine.console_player import ConsolePlayer
+from pokerGame.engine.action import Action
 
 
 class TestConsolePlayer(unittest.TestCase):
