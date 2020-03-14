@@ -64,7 +64,7 @@ class Dealer:
         last_player_to_go = self.seating.button_player()
         winner = self.ask_players_for_actions(last_player_to_go, last_player_to_go.money_in_pot, True)
         if winner:
-            return winner
+            return True
         else:
             for pot in self.pot.get_all_pots():
                 winners = card_showdown.find_winners(pot.players, self.community_cards)
@@ -92,15 +92,13 @@ class Dealer:
                     return self.ask_players_for_actions(next_player, p_amount, False)
                 if self.is_winner_determined():
                     winner = list(self.pot.players.keys())[0]
-                    return self.award_player_as_winner(winner)
+                    winner.stack += self.pot.pot_size()
+                    return True
             next_player = self.seating.next_player_after_player(next_player)
+        return False
 
     def is_winner_determined(self):
         return len(self.pot.players) == 1
-
-    def award_player_as_winner(self, winner):
-        winner.stack += self.pot.pot_size()
-        return winner
 
     def player_folds(self, player):
         player.money_in_pot = 0

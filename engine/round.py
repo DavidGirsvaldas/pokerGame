@@ -4,22 +4,18 @@ class Round:
         self.dealer = dealer
 
     def play_round(self, small_blind):
+        print("# Start round")
         self.dealer.setup_deck()
-        winner = self.dealer.play_preflop(small_blind)
-        if winner:
-            self.dealer.move_button()
-            return winner
-        print("# Preflop concluded")
-        winner = self.dealer.play_flop()
-        if winner:
-            self.dealer.move_button()
-            return winner
-        print("# Flop concluded")
-        winner = self.dealer.play_turn()
-        if winner:
-            self.dealer.move_button()
-            return winner
-        print("# Turn concluded")
-        self.dealer.move_button()
-        return self.dealer.play_river()
+        is_round_concluded = self.dealer.play_preflop(small_blind)
+        if not is_round_concluded:
+            print("# Preflop concluded")
+            is_round_concluded = self.dealer.play_flop()
+            if not is_round_concluded:
+                print("# Flop concluded")
+                is_round_concluded = self.dealer.play_turn()
+                if not is_round_concluded:
+                    print("# Turn concluded")
+                    self.dealer.play_river()
+        print("# Round ended")
+        # todo test button marker is moved
 

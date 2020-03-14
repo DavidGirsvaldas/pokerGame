@@ -51,8 +51,8 @@ class TestRound(unittest.TestCase):
         seating = Seating([button_player, sb_player, bb_player, utg_player])
         dealer = Dealer(None, seating)
         round = Round(dealer)
-        winner = round.play_round(5)
-        self.assertEqual("BigBlind", winner.name)
+        round.play_round(5)
+        self.assertEqual(0, len(dealer.community_cards))
 
     def test_play_round__when_player_wins_in_flop__round_concludes(self):
         initial_stack = 1000
@@ -68,7 +68,7 @@ class TestRound(unittest.TestCase):
         dealer = Dealer(None, seating)
         round = Round(dealer)
         winner = round.play_round(5)
-        self.assertEqual("Button", winner.name)
+        self.assertEqual(3, len(dealer.community_cards))
 
     def test_play_round__when_player_wins_in_turn__round_concludes(self):
         initial_stack = 1000
@@ -83,30 +83,8 @@ class TestRound(unittest.TestCase):
         seating = Seating([button_player, sb_player, bb_player, utg_player])
         dealer = Dealer(None, seating)
         round = Round(dealer)
-        winner = round.play_round(5)
-        self.assertEqual("Button", winner.name)
-
-    def test_play_round__when_playing_two_rounds__button_marker_is_moved(self):
-        initial_stack = 1000
-        player1 = self.setup_new_player("Button", initial_stack)
-        player2 = self.setup_new_player("SmallBlind", initial_stack)
-        player3 = self.setup_new_player("BigBlind", initial_stack)
-        player4 = self.setup_new_player("UTG", initial_stack)
-        player1.act = TestDealer.action_call_fold(1)
-        player2.act = TestDealer.action_call_fold(1)
-        player3.act = TestDealer.action_call_fold(1)
-        player4.act = TestDealer.action_call_fold(1)
-        seating = Seating([player1, player2, player3, player4])
-        dealer = Dealer(None, seating)
-        round = Round(dealer)
-        winner = round.play_round(5)
-        self.assertEqual("Button", winner.name)
-        player1.name = "UTG"
-        player2.name = "Button"
-        player3.name = "SmallBlind"
-        player4.name = "BigBlind"
-        winner = round.play_round(5)
-        self.assertEqual("BigBlind", winner.name)
+        round.play_round(5)
+        self.assertEqual(4, len(dealer.community_cards))
 
     def test_play_round__when_players_allin_with_unequal_stacks___side_pots_are_formed(self):
         stack_player1 = 1000
@@ -144,7 +122,7 @@ class TestRound(unittest.TestCase):
         player3.act = TestDealer.action_raise(stack_player3)
         seating = Seating([player1, player2, player3])
         dealer = Dealer(None, seating, 27)
-        # draw for Button and SmallBlind, both 2 pairs with same kicker
+        # draw for Button and SmallBlind, both have 2 pairs with same kicker
         round = Round(dealer)
         round.play_round(5)
         self.assertEqual(stack_player1 + 500, player1.stack)
