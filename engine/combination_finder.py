@@ -1,6 +1,6 @@
 from typing import List
-from .card import Card
-from . import combinations
+from engine.card import Card
+from engine import combinations
 
 
 def find(cards: List[Card]):
