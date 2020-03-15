@@ -1,9 +1,9 @@
-from engine.action import Action
-from engine.console_player import ConsolePlayer
-from engine.dealer import Dealer
-from engine.game_settings import DefaultGameSettings
-from engine.round import Round
-from engine.seating import Seating
+from .action import Action
+from .console_player import ConsolePlayer
+from .dealer import Dealer
+from .game_settings import DefaultGameSettings
+from .round import Round
+from .seating import Seating
 
 
 def action_check_call():

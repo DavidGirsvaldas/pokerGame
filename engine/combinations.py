@@ -1,10 +1,10 @@
 from typing import Iterable, List
 
-from engine.card import Card
-from engine.combination import Combination
+from .card import Card
+from .combination import Combination
 from collections import defaultdict
 
-from engine.rank import Rank
+from .rank import Rank
 
 
 def find_high_card(cards: Iterable[Card]):

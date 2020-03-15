@@ -1,6 +1,6 @@
 import unittest
 
-from engine.game_settings import DefaultGameSettings
+from ..engine.game_settings import DefaultGameSettings
 
 
 class DefaultGameSettingsTests(unittest.TestCase):

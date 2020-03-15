@@ -1,5 +1,5 @@
-from engine.console_player import ConsolePlayer
-from engine.player import Player
+from .console_player import ConsolePlayer
+from .player import Player
 
 
 class DefaultGameSettings:

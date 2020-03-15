@@ -1,5 +1,5 @@
-from engine.suit import Suit
-from engine.rank import Rank
+from .suit import Suit
+from .rank import Rank
 
 
 class Card:

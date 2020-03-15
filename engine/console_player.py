@@ -1,5 +1,5 @@
-from engine.action import Action
-from engine.player import Player
+from .action import Action
+from .player import Player
 
 
 class ConsolePlayer(Player):
