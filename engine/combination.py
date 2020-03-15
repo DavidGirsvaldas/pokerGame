@@ -1,4 +1,4 @@
-from engine.rank import Rank
+from .rank import Rank
 
 
 class Combination:

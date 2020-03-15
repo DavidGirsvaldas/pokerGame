@@ -1,7 +1,7 @@
 import unittest
 
-from engine.player import Player
-from engine.pot import Pot
+from ..engine.player import Player
+from ..engine.pot import Pot
 
 
 class TestPot(unittest.TestCase):

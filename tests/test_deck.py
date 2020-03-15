@@ -1,7 +1,7 @@
 import unittest
 
-from engine.card import Card
-from engine.deck import Deck
+from ..engine.card import Card
+from ..engine.deck import Deck
 
 
 class TestDeck(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 
-from engine.combination import Combination
-from engine.rank import Rank
+from ..engine.combination import Combination
+from ..engine.rank import Rank
 
 
 class TestCombination(unittest.TestCase):

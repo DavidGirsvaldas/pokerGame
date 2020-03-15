@@ -1,6 +1,6 @@
-from engine.rank import Rank
-from engine.suit import Suit
-from engine.card import Card
+from .rank import Rank
+from .suit import Suit
+from .card import Card
 import random
 
 
