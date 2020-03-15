@@ -1,7 +1,7 @@
 from engine import card_showdown
 from engine.action import Action
 from engine.deck import Deck
-from engine.pot import Pot
+from .pot import Pot
 
 
 class Dealer:
