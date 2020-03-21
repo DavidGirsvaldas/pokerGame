@@ -9,5 +9,6 @@ setup(
     license='MIT',
     keywords='python poker engine',
     url='https://github.com/DavidGirsvaldas/pokerGame',
-    packages=[pkg for pkg in find_packages() if pkg != "tests"]
+    packages=[pkg for pkg in find_packages() if pkg != "tests"],
+    install_requires=['djangorestframework', 'django']
 )
