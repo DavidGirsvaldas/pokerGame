@@ -2,7 +2,6 @@ from collections import defaultdict
 
 
 class Pot:
-
     def __init__(self):
         self.size = 0
         self.players = defaultdict(int)
@@ -20,15 +19,18 @@ class Pot:
         return amount
 
     def player_calls(self, player, amount):
+        def is_pot_split_required():
+            player_doesnt_have_enough = self.players[player] < max(self.players.values())
+            other_pot_players_cant_match_bet_made = self.pot_max_size() and self.players[player] > self.pot_max_size()
+            return player_doesnt_have_enough or other_pot_players_cant_match_bet_made
+
         amount_to_add = amount - self.players[player]
         player.stack -= amount_to_add
         self.players[player] += amount_to_add
         player.money_in_pot += amount_to_add
-        player_doesnt_have_enough = self.players[player] < max(self.players.values())
-        other_pot_players_cant_match_bet_made = self.pot_max_size() and self.players[player] > self.pot_max_size()
-        if player_doesnt_have_enough or other_pot_players_cant_match_bet_made:
+        if is_pot_split_required():
             for p in self.players:
-                amount_to_leave_in_pot = 99999 # todo -ugly! refactor
+                amount_to_leave_in_pot = 99999  # todo -ugly! refactor
                 if self.pot_max_size():
                     amount_to_leave_in_pot = self.pot_max_size()
                 in_pot = self.players[player]

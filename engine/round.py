@@ -1,7 +1,10 @@
-class Round:
+from dataclasses import dataclass
+from engine.dealer import Dealer
 
-    def __init__(self, dealer):
-        self.dealer = dealer
+
+@dataclass
+class Round:
+    dealer: Dealer
 
     def play_round(self, small_blind):
         print("# Start round")
@@ -18,4 +21,3 @@ class Round:
                     self.dealer.play_river()
         print("# Round ended")
         # todo test button marker is moved
-

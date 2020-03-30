@@ -1,12 +1,14 @@
+from dataclasses import dataclass
+
 from engine.rank import Rank
 from engine.suit import Suit
 from engine.card import Card
 import random
 
 
+@dataclass
 class Deck:
-    def __init__(self):
-        self.cards = None
+    cards: [Card] = None
 
     def initialize(self):
         self.cards = []
@@ -14,7 +16,7 @@ class Deck:
             for rank in Rank:
                 self.cards.append(Card(rank, suit))
 
-    def shuffle(self, random_seed = None):
+    def shuffle(self, random_seed=None):
         if random_seed:
             random.Random(random_seed).shuffle(self.cards)
         else:

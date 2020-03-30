@@ -1,8 +1,12 @@
-class Seating:
+from dataclasses import dataclass
 
-    def __init__(self, players):
-        self.players = players
-        self.button_pos = 0
+from engine.player import Player
+
+
+@dataclass
+class Seating:
+    players: [Player]
+    button_pos = 0
 
     def button_player(self):
         return self.players[self.button_pos]

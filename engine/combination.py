@@ -1,26 +1,10 @@
-from engine.rank import Rank
+from dataclasses import dataclass
 
 
+@dataclass(order=True, eq=True)
 class Combination:
-
-    def __init__(self, strength: int, kickers: [Rank] = None):
-        self.strength = strength
-        self.kickers = kickers
-
-    def __eq__(self, other):
-        return self.strength == other.strength and self.kickers == other.kickers
-
-    def __ne__(self, other):
-        return self.strength != other.strength or self.kickers != other.kickers
-
-    def __lt__(self, other):
-        if self.strength == other.strength:
-            for i in range(0, 5):
-                if other.kickers[i] == self.kickers[i]:
-                    continue
-                else:
-                    return other.kickers[i] > self.kickers[i]
-        return self.strength < other.strength
+    strength: int
+    kickers: []
 
     def __str__(self):
         switcher = {

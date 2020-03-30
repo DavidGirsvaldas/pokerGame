@@ -8,10 +8,10 @@ class Suit(Enum):
     hearths = 4
 
     def __str__(self):
-        switcher = {
+        suit_names = {
             1: "spades",
             2: "clubs",
             3: "diamonds",
             4: "hearts"
         }
-        return switcher[self.value]
+        return suit_names[self.value]

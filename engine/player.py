@@ -1,5 +1,4 @@
 class Player:
-
     def __init__(self, name, initial_stack = 0):
         self.cards = []
         self.stack = initial_stack
