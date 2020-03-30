@@ -7,6 +7,7 @@ from engine.player import Player
 from engine.pot import Pot
 from engine.seating import Seating
 from tests.test_deck import TestDeck
+from parameterized import parameterized
 
 
 class TestDealer(unittest.TestCase):
@@ -414,16 +415,12 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(3, len(dealer.community_cards))
         self.assertEqual(TestDeck.deck_size - len(players) * 2 - 3, len(dealer.deck.cards))
 
-    def test_playing_flop__when_small_blind_is_10_and_player_bets__2players_calls(self):
-        self.execute_test_of_player_betting_post_flop_and_all_calling(10, 3)
-
-    def test_playing_flop__when_small_blind_is_15_and_player_bets__2players_calls(self):
-        self.execute_test_of_player_betting_post_flop_and_all_calling(15, 3)
-
-    def test_playing_flop__when_small_blind_is_15_and_player_bets__4players_calls(self):
-        self.execute_test_of_player_betting_post_flop_and_all_calling(15, 5)
-
-    def execute_test_of_player_betting_post_flop_and_all_calling(self, small_blind_size, player_count):
+    @parameterized.expand([
+        ["sb 10, 3 players", 10, 3],
+        ["sb 15, 3 players", 15, 3],
+        ["sb 15, 5 players", 15, 5]
+    ])
+    def test_playing_flop__when_player_bets_and_everybody_calls(self, name, small_blind_size, player_count):
         initial_stack = 100
         big_blind_size = small_blind_size * 2
         bet_size = big_blind_size + 20
@@ -436,14 +433,11 @@ class TestDealer(unittest.TestCase):
         self.assertTrue(all(p.stack == initial_stack - bet_size for p in players))
         self.assertEqual(bet_size * player_count, dealer.pot.total_count())
 
-    def test_playing_flop__when_player_bets_20__one_folds_another_calls(self):
-        self.execute_test_of_player_betting_post_flop(20)
-
-    # todo can this be made into test case?
-    def test_playing_flop__when_player_bets_50__one_folds_another_calls(self):
-        self.execute_test_of_player_betting_post_flop(50)
-
-    def execute_test_of_player_betting_post_flop(self, bet_amount):
+    @parameterized.expand([
+        ["50", 50],
+        ["20", 20]
+    ])
+    def test_playing_flop__when_player_bets_amount_and_another_calls(self, name, bet_amount):
         initial_stack = 100
         small_blind_size = 10
         big_blind_size = small_blind_size * 2
