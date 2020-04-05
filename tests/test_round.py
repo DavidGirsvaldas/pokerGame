@@ -69,7 +69,7 @@ class TestRound(unittest.TestCase):
         dealer = Dealer(None, seating)
         round = Round(dealer)
         winner = round.play_round(5)
-        self.assertEqual(3, len(dealer.community_cards))
+        self.assertEqual(41, len(dealer.deck.cards))
 
     def test_play_round__when_player_wins_in_turn__round_concludes(self):
         initial_stack = 1000
@@ -85,9 +85,9 @@ class TestRound(unittest.TestCase):
         dealer = Dealer(None, seating)
         round = Round(dealer)
         round.play_round(5)
-        self.assertEqual(4, len(dealer.community_cards))
+        self.assertEqual(40, len(dealer.deck.cards))
 
-    def test_play_round__when_players_allin_with_unequal_stacks___side_pots_are_formed(self):
+    def test_play_round__when_players_allin_with_unequal_stacks__side_pots_are_formed(self):
         stack_player1 = 1000
         stack_player2 = 3300
         stack_player3 = 7500
@@ -111,7 +111,7 @@ class TestRound(unittest.TestCase):
         self.assertEqual(0, player3.stack)
         self.assertEqual(stack_player4 - stack_player2 * 2 + stack_player3, player4.stack)
 
-    def test_play_round__when_draw___pot_is_shared(self):
+    def test_play_round__when_draw__pot_is_shared(self):
         stack_player1 = 10000
         stack_player2 = 3000
         stack_player3 = 1001  # 1 chip will be dropped when splitting pot
@@ -130,20 +130,57 @@ class TestRound(unittest.TestCase):
         self.assertEqual(stack_player2 + 500, player2.stack)
         self.assertEqual(0, player3.stack)
 
-    def test_play_round__when_round_concludes___button_is_moved(self):
-        stack_player1 = 10000
-        stack_player2 = 3000
-        stack_player3 = 1001  # 1 chip will be dropped when splitting pot
-        player1 = self.setup_new_player("Button", stack_player1)
-        player2 = self.setup_new_player("SmallBlind", stack_player2)
-        player3 = self.setup_new_player("BigBlind", stack_player3)
-        player1.act = TestDealer.action_raise(stack_player3)
-        player2.act = TestDealer.action_raise(stack_player2)
-        player3.act = TestDealer.action_raise(stack_player3)
+    def test_play_round__when_round_ends__cards_are_collected(self):
+        stack_player1 = 100
+        stack_player2 = 100
+        stack_player3 = 100
+        player1 = self.setup_new_player("Player1", stack_player1)
+        player2 = self.setup_new_player("Player2", stack_player2)
+        player3 = self.setup_new_player("Player3", stack_player3)
+        player1.act = TestDealer.action_raise(100)
+        player2.act = TestDealer.action_raise(100)
+        player3.act = TestDealer.action_raise(100)
         seating = Seating([player1, player2, player3])
         dealer = Dealer(None, seating, 27)
+        # draw for Button and SmallBlind, both have 2 pairs with same kicker
+        round = Round(dealer)
+        round.play_round(5)
+        self.assertEqual(0, len(dealer.community_cards))
+        self.assertEqual(0, len(player1.cards))
+        self.assertEqual(0, len(player2.cards))
+        self.assertEqual(0, len(player3.cards))
+
+    def test_play_round__when_round_concludes___button_is_moved(self):
+        stack_player1 = 100
+        stack_player2 = 100
+        player1 = self.setup_new_player("Player1", stack_player1)
+        player2 = self.setup_new_player("Player2", stack_player2)
+        player1.act = TestDealer.action_fold()
+        player2.act = TestDealer.action_fold()
+        seating = Seating([player1, player2])
+        dealer = Dealer(None, seating)
         dealer.move_button = MagicMock()
         # draw for Button and SmallBlind, both have 2 pairs with same kicker
         round = Round(dealer)
         round.play_round(5)
         self.assertTrue(dealer.move_button.called)
+
+    def test_is_winner_determined__when_more_than_one_player_left_with_chips__returns_false(self):
+        stack_player1 = 100
+        stack_player2 = 100
+        player1 = self.setup_new_player("Player1", stack_player1)
+        player2 = self.setup_new_player("Player2", stack_player2)
+        seating = Seating([player1, player2])
+        dealer = Dealer(None, seating)
+        round = Round(dealer)
+        self.assertFalse(round.is_winner_determined())
+
+    def test_is_winner_determined__when_one_player_left_with_chips__returns_true(self):
+        stack_player1 = 200
+        stack_player2 = 0
+        player1 = self.setup_new_player("Player1", stack_player1)
+        player2 = self.setup_new_player("Player2", stack_player2)
+        seating = Seating([player1, player2])
+        dealer = Dealer(None, seating)
+        round = Round(dealer)
+        self.assertTrue(round.is_winner_determined())

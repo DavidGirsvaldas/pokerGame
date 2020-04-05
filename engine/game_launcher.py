@@ -16,4 +16,5 @@ game_settings = DefaultGameSettings()
 seating = Seating(game_settings.players)
 dealer = Dealer(None, seating)
 round = Round(dealer)
-round.play_round(game_settings.small_blind_size)
+while not round.is_winner_determined():
+    round.play_round(game_settings.small_blind_size)

@@ -8,6 +8,9 @@ class Player:
     def receive_cards(self, cards):
         self.cards = cards
 
+    def release_cards(self):
+        self.cards.clear()
+
     def __str__(self):
         return self.name + " (" + str(self.stack)+ ")"
 

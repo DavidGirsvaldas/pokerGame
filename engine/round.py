@@ -21,3 +21,10 @@ class Round:
                     self.dealer.play_river()
         print("# Round ended")
         self.dealer.move_button()
+        self.dealer.community_cards.clear()
+        for player in self.dealer.seating.players:
+            player.release_cards()
+
+    def is_winner_determined(self):
+        players_with_chips = [player for player in self.dealer.seating.players if player.stack > 0]
+        return len(players_with_chips) is 1

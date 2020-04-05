@@ -102,7 +102,7 @@ class Dealer:
 
     def player_folds(self, player):
         player.money_in_pot = 0
-        player.cards = None
+        player.release_cards()
         if player in self.pot.chips_per_player:
             self.pot.size += self.pot.chips_per_player[player]
             self.pot.chips_per_player.pop(player, None)
