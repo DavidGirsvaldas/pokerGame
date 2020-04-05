@@ -4,7 +4,6 @@ python:
 install:
   - pip install python-coveralls
   - pip install coverage==4.5.4
-  - pip install parameterized
 script:
   - coverage run -m unittest discover -s "./tests"
 after_success:

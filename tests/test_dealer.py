@@ -7,7 +7,6 @@ from engine.player import Player
 from engine.pot import Pot
 from engine.seating import Seating
 from tests.test_deck import TestDeck
-from parameterized import parameterized
 
 
 class TestDealer(unittest.TestCase):
@@ -415,51 +414,51 @@ class TestDealer(unittest.TestCase):
         self.assertEqual(3, len(dealer.community_cards))
         self.assertEqual(TestDeck.deck_size - len(players) * 2 - 3, len(dealer.deck.cards))
 
-    @parameterized.expand([
-        ["sb 10, 3 players", 10, 3],
-        ["sb 15, 3 players", 15, 3],
-        ["sb 15, 5 players", 15, 5]
-    ])
-    def test_playing_flop__when_player_bets_and_everybody_calls(self, name, small_blind_size, player_count):
-        initial_stack = 100
-        big_blind_size = small_blind_size * 2
-        bet_size = big_blind_size + 20
-        players = [self.setup_new_player("Player" + str(i), initial_stack) for i in range(player_count)]
-        dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
-        players[player_count - 1].act = self.action_raise(bet_size)
-        winner = dealer.play_flop()
-        self.assertEqual(False, winner)
-        self.assertTrue(all(p in dealer.pot.chips_per_player for p in players))
-        self.assertTrue(all(p.stack == initial_stack - bet_size for p in players))
-        self.assertEqual(bet_size * player_count, dealer.pot.total_count())
+    def test_playing_flop__when_player_bets_and_everybody_calls(self):
+        param_list = [
+            (10, 3),
+            (15, 3),
+            (15, 5)
+        ]
+        for small_blind_size, player_count in param_list:
+            with self.subTest():
+                initial_stack = 100
+                big_blind_size = small_blind_size * 2
+                bet_size = big_blind_size + 20
+                players = [self.setup_new_player("Player" + str(i), initial_stack) for i in range(player_count)]
+                dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
+                players[player_count - 1].act = self.action_raise(bet_size)
+                winner = dealer.play_flop()
+                self.assertEqual(False, winner)
+                self.assertTrue(all(p in dealer.pot.chips_per_player for p in players))
+                self.assertTrue(all(p.stack == initial_stack - bet_size for p in players))
+                self.assertEqual(bet_size * player_count, dealer.pot.total_count())
 
-    @parameterized.expand([
-        ["50", 50],
-        ["20", 20]
-    ])
-    def test_playing_flop__when_player_bets_amount_and_another_calls(self, name, bet_amount):
-        initial_stack = 100
-        small_blind_size = 10
-        big_blind_size = small_blind_size * 2
-        bet_size = big_blind_size + bet_amount
-        button_player = self.setup_new_player("Button", initial_stack)
-        sb_player = self.setup_new_player("SmallBlind", initial_stack)
-        bb_player = self.setup_new_player("BigBlind", initial_stack)
-        players = [button_player, sb_player, bb_player]
-        dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
+    def test_playing_flop__when_player_bets_amount_and_another_calls(self):
+        for bet_amount in [50, 20]:
+            with self.subTest():
+                initial_stack = 100
+                small_blind_size = 10
+                big_blind_size = small_blind_size * 2
+                bet_size = big_blind_size + bet_amount
+                button_player = self.setup_new_player("Button", initial_stack)
+                sb_player = self.setup_new_player("SmallBlind", initial_stack)
+                bb_player = self.setup_new_player("BigBlind", initial_stack)
+                players = [button_player, sb_player, bb_player]
+                dealer = self.setup_dealer_and_play_preflop_where_everybody_calls(players, small_blind_size)
 
-        button_player.act = self.action_check_call()
-        sb_player.act = self.action_raise(bet_size)
-        bb_player.act = self.action_fold()
-        winner = dealer.play_flop()
-        self.assertEqual(False, winner)
-        self.assertTrue(button_player in dealer.pot.chips_per_player)
-        self.assertTrue(sb_player in dealer.pot.chips_per_player)
-        self.assertTrue(bb_player not in dealer.pot.chips_per_player)
-        self.assertEqual(initial_stack - bet_size, button_player.stack)
-        self.assertEqual(initial_stack - bet_size, sb_player.stack)
-        self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
-        self.assertEqual(bet_size * 2 + big_blind_size, dealer.pot.total_count())
+                button_player.act = self.action_check_call()
+                sb_player.act = self.action_raise(bet_size)
+                bb_player.act = self.action_fold()
+                winner = dealer.play_flop()
+                self.assertEqual(False, winner)
+                self.assertTrue(button_player in dealer.pot.chips_per_player)
+                self.assertTrue(sb_player in dealer.pot.chips_per_player)
+                self.assertTrue(bb_player not in dealer.pot.chips_per_player)
+                self.assertEqual(initial_stack - bet_size, button_player.stack)
+                self.assertEqual(initial_stack - bet_size, sb_player.stack)
+                self.assertEqual(initial_stack - big_blind_size, bb_player.stack)
+                self.assertEqual(bet_size * 2 + big_blind_size, dealer.pot.total_count())
 
     def test_playing_flop_when_player_raises_and_is_called_by_original_betting_player(self):
         initial_stack = 100
