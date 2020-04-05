@@ -140,11 +140,11 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.move_button()
-        seating.button_pos = 0
+        seating.button_position = 0
         dealer.move_button()
-        seating.button_pos = 1
+        seating.button_position = 1
         dealer.move_button()
-        seating.button_pos = 0
+        seating.button_position = 0
 
     def test_move_button__when5players(self):
         player1 = self.setup_new_player("Player1", 100)
@@ -156,19 +156,19 @@ class TestDealer(unittest.TestCase):
         deck = Deck()
         dealer = Dealer(deck, seating)
         dealer.move_button()
-        seating.button_pos = 0
+        seating.button_position = 0
         dealer.move_button()
-        seating.button_pos = 1
+        seating.button_position = 1
         dealer.move_button()
-        seating.button_pos = 2
+        seating.button_position = 2
         dealer.move_button()
-        seating.button_pos = 3
+        seating.button_position = 3
         dealer.move_button()
-        seating.button_pos = 4
+        seating.button_position = 4
         dealer.move_button()
-        seating.button_pos = 5
+        seating.button_position = 5
         dealer.move_button()
-        seating.button_pos = 0
+        seating.button_position = 0
 
     def test_preflop_round__when_all_fold(self):
         initial_stack = 1000
