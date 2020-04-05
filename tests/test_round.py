@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 
 from engine.action import Action
 from engine.dealer import Dealer
@@ -113,7 +114,7 @@ class TestRound(unittest.TestCase):
     def test_play_round__when_draw___pot_is_shared(self):
         stack_player1 = 10000
         stack_player2 = 3000
-        stack_player3 = 1001 # 1 chip will be dropped when splitting pot
+        stack_player3 = 1001  # 1 chip will be dropped when splitting pot
         player1 = self.setup_new_player("Button", stack_player1)
         player2 = self.setup_new_player("SmallBlind", stack_player2)
         player3 = self.setup_new_player("BigBlind", stack_player3)
@@ -128,3 +129,21 @@ class TestRound(unittest.TestCase):
         self.assertEqual(stack_player1 + 500, player1.stack)
         self.assertEqual(stack_player2 + 500, player2.stack)
         self.assertEqual(0, player3.stack)
+
+    def test_play_round__when_round_concludes___button_is_moved(self):
+        stack_player1 = 10000
+        stack_player2 = 3000
+        stack_player3 = 1001  # 1 chip will be dropped when splitting pot
+        player1 = self.setup_new_player("Button", stack_player1)
+        player2 = self.setup_new_player("SmallBlind", stack_player2)
+        player3 = self.setup_new_player("BigBlind", stack_player3)
+        player1.act = TestDealer.action_raise(stack_player3)
+        player2.act = TestDealer.action_raise(stack_player2)
+        player3.act = TestDealer.action_raise(stack_player3)
+        seating = Seating([player1, player2, player3])
+        dealer = Dealer(None, seating, 27)
+        dealer.move_button = MagicMock()
+        # draw for Button and SmallBlind, both have 2 pairs with same kicker
+        round = Round(dealer)
+        round.play_round(5)
+        self.assertTrue(dealer.move_button.called)

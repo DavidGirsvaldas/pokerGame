@@ -20,4 +20,4 @@ class Round:
                     print("# Turn concluded")
                     self.dealer.play_river()
         print("# Round ended")
-        # todo test button marker is moved
+        self.dealer.move_button()

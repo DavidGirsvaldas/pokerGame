@@ -1,5 +1,4 @@
 from engine.action import Action
-from engine.console_player import ConsolePlayer
 from engine.dealer import Dealer
 from engine.game_settings import DefaultGameSettings
 from engine.round import Round
@@ -13,11 +12,8 @@ def action_check_call():
     return player_action_call
 
 
-game_setings = DefaultGameSettings()
-for player in game_setings.players:
-    if player is not ConsolePlayer:
-        player.act = action_check_call()
-seating = Seating(game_setings.players)
+game_settings = DefaultGameSettings()
+seating = Seating(game_settings.players)
 dealer = Dealer(None, seating)
 round = Round(dealer)
-round.play_round(game_setings.small_blind_size)
+round.play_round(game_settings.small_blind_size)
