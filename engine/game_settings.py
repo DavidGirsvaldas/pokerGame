@@ -1,5 +1,6 @@
 from engine.computer_player import ComputerPlayer
 from engine.console_player import ConsolePlayer
+from engine.seating import Seating
 
 
 class DefaultGameSettings:
@@ -11,6 +12,7 @@ class DefaultGameSettings:
         player1 = ComputerPlayer("Player1", self.initial_stack)
         player2 = ComputerPlayer("Player2", self.initial_stack)
         player3 = ComputerPlayer("Player3", self.initial_stack)
-        self.players = [player0, player1, player2, player3]
+        players = [player0, player1, player2, player3]
         console_player = ConsolePlayer("ConsolePlayer", self.initial_stack)
-        self.players.append(console_player)
+        players.append(console_player)
+        self.seating = Seating(players)
