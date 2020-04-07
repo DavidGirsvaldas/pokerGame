@@ -1,18 +1,22 @@
+from pypokerengine.engine.card import Card
 from pypokerengine.utils.card_utils import estimate_hole_card_win_rate, gen_cards
 
+from engine.action import Action
 from engine.player import Player
 from engine.suit import Suit
 
 
 class ComputerPlayer(Player):
 
-    def receive_cards(self, cards):
-        super().receive_cards(cards)
-        self.estimate_chance_of_winning()
-
-    def see_community_cards(self, cards):
-        super().see_community_cards(cards)
-        self.estimate_chance_of_winning()
+    def act(self, amount):
+        chance = self.estimate_chance_of_winning(self.cards, self.community_cards)
+        if chance < 0.15 and amount > self.money_in_pot:
+            return Action.ACTION_FOLD, 0
+        if chance > 0.3:
+            if amount < self.stack + self.money_in_pot:
+                return Action.ACTION_RAISE, amount + 100
+            return Action.ACTION_CALL, self.stack + self.money_in_pot
+        return Action.ACTION_CALL, amount
 
     def convert_card_representation(self, local_card_format):
         suit_converter = {
@@ -33,16 +37,18 @@ class ComputerPlayer(Player):
             rank_representation = rank_converter[local_card_format.rank]
         else:
             rank_representation = str(local_card_format.rank)
-        return gen_cards([suit_representation + rank_representation])[0]
+        return Card.from_str(suit_representation + rank_representation)
 
-    def estimate_chance_of_winning(self):
-        card_representations = [self.convert_card_representation(card) for card in self.cards]
-        community_card_representations = [self.convert_card_representation(card) for card in self.community_cards]
-        win_rate = estimate_hole_card_win_rate(
+    def estimate_chance_of_winning(self, player_cards, community_cards):
+        card_representations = [self.convert_card_representation(card) for card in player_cards]
+        community_card_representations = [self.convert_card_representation(card) for card in community_cards]
+        win_rate = self.estimate_winrate(card_representations, community_card_representations)
+        return win_rate
+
+    def estimate_winrate(self, card_representations, community_card_representations):
+        return estimate_hole_card_win_rate(
             nb_simulation=1000,
             nb_player=5,
             hole_card=card_representations,
             community_card=community_card_representations
         )
-        print(win_rate)
-        return win_rate
