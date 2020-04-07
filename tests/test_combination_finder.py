@@ -12,7 +12,7 @@ class CombinationFinderTests(unittest.TestCase):
         sc = Suit.clubs
         sd = Suit.diamonds
         ss = Suit.spades
-        sh = Suit.hearths
+        sh = Suit.hearts
         # 1
         test_input = [Card(Rank(2), sc), Card(Rank(10), sh), Card(Rank(13), ss), Card(Rank(4), sd), Card(Rank(3), sc),
                       Card(Rank(7), sc), Card(Rank(5), sc)]
@@ -61,7 +61,7 @@ class CombinationFinderTests(unittest.TestCase):
         sc = Suit.clubs
         sd = Suit.diamonds
         ss = Suit.spades
-        sh = Suit.hearths
+        sh = Suit.hearts
         # when full house found then returns combo ordered by kickers
         test_input = [Card(Rank.Ace, sc), Card(Rank.Ace, sd), Card(Rank.Ace, ss), Card(Rank.King, sc),
                       Card(Rank.King, sh)]
@@ -87,7 +87,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual(expected.kickers, result.kickers)
 
     def test__find_flush(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when 5 hearths flush then returns combo with kickers ordered by strength
         test_input = [Card(Rank.King, sh), Card(Rank.r2, sh), Card(Rank.r4, sh), Card(Rank.r5, sh), Card(Rank.r6, sh)]
@@ -109,7 +109,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual([Rank.Ace, Rank.Jack, Rank.r10, Rank.r6, Rank.r5], result.kickers)
 
     def test_is_straight_flush(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when 5 hearths straight flush then returns combo with kickers ordered by strength
         test_input = [Card(Rank.r6, sh), Card(Rank.Ace, ss), Card(Rank.r5, ss), Card(Rank.r5, sh), Card(Rank.r2, sh),
@@ -126,7 +126,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual([Rank.King, Rank.Queen, Rank.Jack, Rank.r10, Rank.r9], result.kickers)
 
     def test_is_straight(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when straight then returns combo with kickers ordered by strength (1)
         test_input = [Card(Rank.r6, sh), Card(Rank.Queen, ss), Card(Rank.r5, ss), Card(Rank.r5, sh),
@@ -149,7 +149,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace], result.kickers)
 
     def test_find_three_of_a_kind(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when three of a kind found then returns combo with kickers ordered by strength (1)
         test_input = [Card(Rank.Jack, sh), Card(Rank.Ace, ss), Card(Rank.Jack, ss), Card(Rank.r5, sh),
@@ -165,7 +165,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual([Rank.Ace, Rank.Ace, Rank.Ace, Rank.r6, Rank.r4], result.kickers)
 
     def test_find_two_pairs(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when two pairs found then returns combo with highest kicker
         test_input = [Card(Rank.Queen, sh), Card(Rank.Ace, ss), Card(Rank.r2, ss), Card(Rank.r5, sh),
@@ -181,7 +181,7 @@ class CombinationFinderTests(unittest.TestCase):
         self.assertEqual([Rank.r3, Rank.r3, Rank.r2, Rank.r2, Rank.r10], result.kickers)
 
     def test_find_pair(self):
-        sh = Suit.hearths
+        sh = Suit.hearts
         ss = Suit.spades
         # when pair found then returns combo with highest kickers (1)
         test_input = [Card(Rank.r9, sh), Card(Rank.Ace, ss), Card(Rank.King, ss), Card(Rank.r4, sh),

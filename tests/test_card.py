@@ -10,7 +10,7 @@ class TestCard(unittest.TestCase):
     def test_to_string__correct_suite_name(self):
         card = Card(Rank.Ace, Suit.diamonds)
         self.assertEqual("Ace of diamonds", str(card))
-        card = Card(Rank.Ace, Suit.hearths)
+        card = Card(Rank.Ace, Suit.hearts)
         self.assertEqual("Ace of hearts", str(card))
         card = Card(Rank.Ace, Suit.clubs)
         self.assertEqual("Ace of clubs", str(card))

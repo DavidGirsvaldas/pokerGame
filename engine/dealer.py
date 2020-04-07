@@ -38,6 +38,8 @@ class Dealer:
 
     def add_community_cards(self, card_count):
         self.community_cards += self.deck.draw(card_count)
+        for player in self.seating.players:
+            player.see_community_cards(self.community_cards)
         print("Community cards: " + ", ".join([str(card) for card in self.community_cards]))
 
     def play_preflop(self, small_blind_size):
