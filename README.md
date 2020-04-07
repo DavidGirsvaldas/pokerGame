@@ -2,4 +2,4 @@
 [![Coverage Status](https://coveralls.io/repos/github/DavidGirsvaldas/pokerGame/badge.svg)](https://coveralls.io/github/DavidGirsvaldas/pokerGame)
 
 # pokerGame
-learning python
+learning python, practising TDD, incorporating poker bot
