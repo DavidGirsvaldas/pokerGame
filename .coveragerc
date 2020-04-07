@@ -1,2 +1,2 @@
-[report]
-omit = */home/*
+[run]
+source = engine
