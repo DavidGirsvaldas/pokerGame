@@ -6,7 +6,7 @@ from engine.seating import Seating
 class DefaultGameSettings:
 
     def __init__(self):
-        self.initial_stack = 5000
+        self.initial_stack = 800
         self.small_blind_size = 25
         player0 = ComputerPlayer("Player0", self.initial_stack)
         player1 = ComputerPlayer("Player1", self.initial_stack)

@@ -124,6 +124,13 @@ class CombinationFinderTests(unittest.TestCase):
         result = combination_finder.find(test_input)
         self.assertEqual(9, result.strength)
         self.assertEqual([Rank.King, Rank.Queen, Rank.Jack, Rank.r10, Rank.r9], result.kickers)
+        # when straight flush starts with Ace
+        test_input = [Card(Rank.r2, ss), Card(Rank.r3, ss), Card(Rank.Ace, ss), Card(Rank.r4, ss),
+                      Card(Rank.r5, ss),
+                      Card(Rank.King, ss), Card(Rank.r4, sh)]
+        result = combination_finder.find(test_input)
+        self.assertEqual(9, result.strength)
+        self.assertEqual([Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace], result.kickers)
 
     def test_is_straight(self):
         sh = Suit.hearts

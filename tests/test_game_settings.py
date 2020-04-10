@@ -7,7 +7,7 @@ class DefaultGameSettingsTests(unittest.TestCase):
 
 
     def tests_get_default_setup(self):
-        initial_stack = 5000
+        initial_stack = 800
         game_settings = DefaultGameSettings()
         self.assertEqual(25, game_settings.small_blind_size)
         self.assertEqual(initial_stack, game_settings.initial_stack)
