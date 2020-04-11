@@ -30,11 +30,7 @@ class Pot:
         player.money_in_pot += amount_to_add
         if is_pot_split_required():
             for p in self.chips_per_player:
-                amount_to_leave_in_pot = 99999  # todo -ugly! refactor
-                if self.pot_max_size():
-                    amount_to_leave_in_pot = self.pot_max_size()
-                in_pot = self.chips_per_player[player]
-                split_amount = self.chips_per_player[p] - min(in_pot, amount_to_leave_in_pot)
+                split_amount = self.chips_per_player[p] - self.pot_max_size()
                 if split_amount > 0:
                     if not self.side_pot:
                         self.side_pot = Pot()

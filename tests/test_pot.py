@@ -36,18 +36,18 @@ class TestPot(unittest.TestCase):
         pot = Pot()
         pot.player_calls(player1, 100)
         pot.player_calls(player2, 90)
-        pot.player_calls(player3, 70)
+        pot.player_calls(player3, 80)
 
         pots = pot.get_all_pots()
         self.assertEqual(3, len(pots))
         main_pot = pots[0]
-        self.assertEqual(210, main_pot.pot_size())
+        self.assertEqual(240, main_pot.pot_size())
         self.assertTrue(player1 in main_pot.chips_per_player)
         self.assertTrue(player2 in main_pot.chips_per_player)
         self.assertTrue(player3 in main_pot.chips_per_player)
 
         side_pot = pots[1]
-        self.assertEqual(40, side_pot.pot_size())
+        self.assertEqual(20, side_pot.pot_size())
         self.assertTrue(player1 in side_pot.chips_per_player)
         self.assertTrue(player2 in side_pot.chips_per_player)
         self.assertTrue(player3 not in side_pot.chips_per_player)

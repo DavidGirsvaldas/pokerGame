@@ -23,11 +23,6 @@ def find_pair(cards: List[Card]):
             return Combination(2, hand)
 
 
-def pick_highest_kickers(hand: List[Rank], all_sorted_card_ranks: List[Rank], required_kicker_count: int):
-    kickers = [rank for rank in all_sorted_card_ranks if rank not in hand]
-    return kickers[:required_kicker_count]
-
-
 def find_two_pairs(cards: List[Card]):
     ranks = [card.rank for card in cards]
     rank_occurrences = count_rank_occurrences(ranks)
@@ -38,13 +33,6 @@ def find_two_pairs(cards: List[Card]):
     ranks_sorted = sorted(ranks, reverse=True)
     hand += pick_highest_kickers(hand, ranks_sorted, 1)
     return Combination(3, hand)
-
-
-def count_rank_occurrences(ranks: List[Rank]):
-    rank_occurrences = defaultdict(int)
-    for rank in ranks:
-        rank_occurrences[rank] += 1
-    return rank_occurrences
 
 
 def find_three_of_a_kind(cards: List[Card]):
@@ -82,20 +70,14 @@ def find_flush(cards: List[Card]):
 
 
 def find_full_house(cards: List[Card]):
-    ranks = [card.rank for card in cards]
-    hand = []
-    ranks_by_strength = sorted(ranks, reverse=True)
-    for i in range(len(ranks_by_strength) - 2):
-        if ranks_by_strength[i] == ranks_by_strength[i + 1] == ranks_by_strength[i + 2]:
-            hand += 3 * [ranks_by_strength[i]]
-            break
-    if len(hand) == 0:
+    three_of_a_kind = find_three_of_a_kind(cards)
+    if not three_of_a_kind:
         return
-    for i in range(len(ranks_by_strength) - 1):
-        if ranks_by_strength[i] == ranks_by_strength[i + 1] != hand[0]:
-            hand += 2 * [ranks_by_strength[i]]
-            break
-    if len(hand) == 5:
+    hand = three_of_a_kind.kickers[:3]
+    remaining_cards = [card for card in cards if card.rank not in hand]
+    pair = find_pair(remaining_cards)
+    if pair:
+        hand += pair.kickers[:2]
         return Combination(7, hand)
 
 
@@ -108,16 +90,6 @@ def find_four_of_a_kind(cards: Iterable[Card]):
             ranks_sorted = sorted(ranks, reverse=True)
             hand += pick_highest_kickers(hand, ranks_sorted, 1)
             return Combination(8, hand)
-
-
-def try_find_straight(ranks_sorted: [Rank]):
-    straight_starting_ace = [Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace]
-    if all(x in ranks_sorted for x in straight_starting_ace):
-        return straight_starting_ace
-    for i in range(len(ranks_sorted) - 4):
-        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (
-                ranks_sorted[i + 4] + 4):
-            return ranks_sorted[i:i + 5]
 
 
 def find_straight_flush(cards: List[Card]):
@@ -138,3 +110,25 @@ def find_royal_flush(cards: List[Card]):
         return
     if straight_flush.kickers[0] is Rank.Ace:
         return Combination(10, straight_flush.kickers)
+
+
+def try_find_straight(ranks_sorted: [Rank]):
+    straight_starting_ace = [Rank.r5, Rank.r4, Rank.r3, Rank.r2, Rank.Ace]
+    if all(x in ranks_sorted for x in straight_starting_ace):
+        return straight_starting_ace
+    for i in range(len(ranks_sorted) - 4):
+        if ranks_sorted[i] == (ranks_sorted[i + 1] + 1) == (ranks_sorted[i + 2] + 2) == (ranks_sorted[i + 3] + 3) == (
+                ranks_sorted[i + 4] + 4):
+            return ranks_sorted[i:i + 5]
+
+
+def pick_highest_kickers(hand: List[Rank], all_sorted_card_ranks: List[Rank], required_kicker_count: int):
+    kickers = [rank for rank in all_sorted_card_ranks if rank not in hand]
+    return kickers[:required_kicker_count]
+
+
+def count_rank_occurrences(ranks: List[Rank]):
+    rank_occurrences = defaultdict(int)
+    for rank in ranks:
+        rank_occurrences[rank] += 1
+    return rank_occurrences
